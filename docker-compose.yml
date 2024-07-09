@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  qiskit:
+    build: .
+    container_name: ftl_quantum
+    volumes:
+      - .:/usr/src/app
+    command: tail -f /dev/null
