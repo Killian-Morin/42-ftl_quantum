@@ -8,13 +8,13 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 RUN pip install --no-cache-dir \
-    qiskit \
+    qiskit==0.39.5 \
     'qiskit[visualization]' \
     qiskit_aer \
-    qiskit_ibm_runtime \
-    matplotlib
-
-RUN pip install python-dotenv
+    qiskit_ibmq_provider \
+    qiskit_terra \
+    matplotlib \
+    python-dotenv
 
 # Copy '.' into the container at /usr/src/app
 COPY . .

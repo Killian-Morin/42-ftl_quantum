@@ -1,24 +1,8 @@
-import os
-from dotenv import load_dotenv
+from qiskit import IBMQ
 
-from qiskit_ibm_runtime import QiskitRuntimeService
+# Cannot import load_dotenv so hard code the token
+token = ''
 
-load_dotenv()
+IBMQ.save_account(token, overwrite=True)
 
-token = os.getenv("TOKEN")
-
-QiskitRuntimeService.save_account(channel="ibm_quantum", token=token, overwrite=True)
-
-# Initialize your account
-service = QiskitRuntimeService(instance="ibm-q/open/main")
-
-backends = service.backends()
-
-print("Backends accessible with this account full detail: ")
-for el in backends:
-    if el.simulator:
-        el_type = "simulated"
-    else:
-        el_type = "real"
-    status = el.status()
-    print(f"\t{el.name} is a {el_type} quantum computer, with {status.pending_jobs} pending jobs and a total of {el.num_qubits} qubits.")
+provider = IBMQ.get_provider(hub="h1", group="g1", project="p1")
