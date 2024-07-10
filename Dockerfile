@@ -2,10 +2,14 @@ FROM python:3.9-bullseye
 
 WORKDIR /usr/src/app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    && rm -rf /var/lib/apt/lists/*
+# Install system dependencies | not necessary
+# RUN apt-get update \
+#     && apt-get install -y build-essential \
+#     && rm -rf /var/lib/apt/lists/*
+
+RUN pip install --upgrade pip
+
+RUN pip install python-dotenv
 
 RUN pip install --no-cache-dir \
     qiskit \
@@ -13,8 +17,6 @@ RUN pip install --no-cache-dir \
     qiskit_aer \
     qiskit_ibm_runtime \
     matplotlib
-
-RUN pip install python-dotenv
 
 # Copy '.' into the container at /usr/src/app
 COPY . .

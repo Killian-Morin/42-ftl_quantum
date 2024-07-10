@@ -17,4 +17,4 @@ down:
 clean: down
 	docker system prune -af
 
-.PHONY: all run down clean connect
+.PHONY: all run build connect down clean
