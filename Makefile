@@ -17,4 +17,7 @@ down:
 clean: down
 	docker system prune -af
 
-.PHONY: all run build connect down clean
+fclean: clean
+	rm -rf ex*/*.png
+
+.PHONY: all run build connect down clean fclean

@@ -6,7 +6,6 @@ from qiskit.visualization import plot_histogram, plot_state_city, plot_bloch_vec
 qc = QuantumCircuit(1, 1)
 qc.h(0)
 qc.measure(0, 0)
-# qc.measure_all()
 
 # * Draw the circuit
 print("ASCII representation of the circuit:")
@@ -52,8 +51,6 @@ plot_histogram(counts, title=f"Measurement result of the plus state with {shots}
 # qobj = assemble(qc_transpile, shots=shots)
 
 # # * Execute the circuit on the qasm simulator
-# # ! execute() is deprecated
-# # result = execute(qc, backend=simulator, shots=500).result()
 # result = sim.run(qc_transpile, shots=500).result()
 
 # counts = result.get_counts()
