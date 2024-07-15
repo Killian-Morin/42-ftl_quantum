@@ -16,7 +16,8 @@ RUN pip install --no-cache-dir \
     'qiskit[visualization]' \
     qiskit_aer \
     qiskit_ibm_runtime \
-    matplotlib
+    matplotlib \
+    ipython
 
 # Copy '.' into the container at /usr/src/app
 COPY . .

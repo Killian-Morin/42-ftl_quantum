@@ -1,6 +1,6 @@
 NAME = ftl_quantum
 
-all : down build run connect
+all : build run connect
 
 run:
 	docker-compose -p ${NAME} up -d

@@ -1,63 +1,54 @@
-from qiskit import QuantumCircuit, transpile, assemble
-from qiskit_aer import AerSimulator, Aer
-from qiskit.visualization import plot_histogram, plot_state_city, plot_bloch_vector
+from qiskit import QuantumCircuit, transpile
+from qiskit_aer import AerSimulator
+from qiskit.visualization import plot_histogram, plot_bloch_vector
 
-# * Create the quantum circuit and apply an Hadamard gate to the qubit to create the superposition state
-qc = QuantumCircuit(1, 1)
-qc.h(0)
-qc.measure(0, 0)
 
-# * Draw the circuit
-print("ASCII representation of the circuit:")
-print(qc, "\n")
-qc.draw(output='mpl', filename="circuit_plus_state", interactive=True)
+def process_result(counts, sim):
+    print(f"Measurements results ({sim} simulator):")
+    print(f"\tfor the 0 state: {counts['0']}")
+    print(f"\tfor the 1 state: {counts['1']}\n")
 
-# * Get a statevector Aer simulator
-sim = Aer.get_backend('statevector_simulator')
+    final_counts = {'0': counts['0'] / 500, '1': counts['1'] / 500}
+    print(f"Measurements results as percentage of 1 ({sim} simulator):")
+    print(f"\tfor the 0 state: {final_counts['0']}")
+    print(f"\tfor the 1 state: {final_counts['1']}\n")
 
-# * Get an Aer simulator and transpile ??
-# * Just another way to instantiate a simulator
-# sim = AerSimulator()
-# qc = transpile(qc, sim)
+    return final_counts
 
-# * Run the circuit on the selected simulator with a precise number of shots
-shots=500
-result = sim.run(qc, shots=shots).result()
+def superposition():
+    # * Create the circuit with 1 qubit and 1 classical bit
+    qc = QuantumCircuit(1, 1)
 
-# * Result processing
-counts = result.get_counts()
-print(f"Measurements results: \n\tfor the 0 state: {counts['0']}\n\tfor the 1 state: {counts['1']}\n")
-counts['0'] = counts['0'] / 100
-counts['1'] = counts['1'] / 100
-print(f"Measurements results as percentage of 1: \n\tfor the 0 state: {counts['0']}\n\tfor the 1 state: {counts['1']}\n")
+    # * Apply an Hadamard gate on the first qubit to create superposition
+    qc.h(0)
 
-# * Draw the result in a histogram
-plot_histogram(counts, title=f"Measurement result of the plus state with {shots} shots", filename="histogram_plus_state")
+    # * Apply the measurement tool to the circuit
+    qc.measure(0, 0)
 
-# ? OTHER VERSION with a qasm_simulator
-# qc = QuantumCircuit(1, 1)
-# qc.h(0)
-# qc.measure(0, 0)
+    # * Draw the circuit
+    print("ASCII representation of the circuit:")
+    print(qc, "\n")
+    qc.draw(output='mpl', filename="circuit_plus_state", interactive=True)
 
-# print("ASCII representation of the circuit:")
-# print(qc, "\n")
-# qc.draw(output='mpl', filename="alt_circuit_plus_state", interactive=True)
+    # * Get the Aer simulator
+    sim = AerSimulator(method='automatic')
 
-# * Get a qasm_simulator Aer simulator and transpile ??
-# sim = Aer.get_backend('qasm_simulator')
-# qc_transpile = transpile(qc, sim)
+    # * Transpile the circuit for the simulator chosen
+    qc_transpile = transpile(qc, backend=sim)
 
-# # * Assemble the circuit into a qobj
-# qobj = assemble(qc_transpile, shots=shots)
+    # * Run the circuit on the selected simulator with a precise number of shots
+    shots = 500
+    result = sim.run(qc_transpile, shots=500).result()
 
-# # * Execute the circuit on the qasm simulator
-# result = sim.run(qc_transpile, shots=500).result()
+    # * Get the type of simulator that was used since chose 'automatic'
+    sim_type = result.results[0].metadata['method']
 
-# counts = result.get_counts()
-# print(f"Measurements results: \n\tfor the 0 state: {counts['0']}\n\tfor the 1 state: {counts['1']}\n")
-# counts['0'] = counts['0'] / 100
-# counts['1'] = counts['1'] / 100
-# print(f"Measurements results as percentage of 1: \n\tfor the 0 state: {counts['0']}\n\tfor the 1 state: {counts['1']}\n")
+    # * Result processing
+    counts = result.get_counts()
+    final_counts = process_result(counts, sim_type)
 
-# # Draw the result in a histogram
-# plot_histogram(counts, title=f"Measurement result of the plus state with {shots} shots", filename="alt_histogram_plus_state")
+    # * Draw the result in a histogram
+    plot_histogram(final_counts, title=f"Measurement result of the plus state with {shots} shots ({sim_type})",
+                    filename="histogram_plus_state")
+
+superposition()
