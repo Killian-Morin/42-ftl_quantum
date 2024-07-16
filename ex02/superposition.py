@@ -15,6 +15,7 @@ def process_result(counts, sim):
 
     return final_counts
 
+
 def superposition():
     # * Create the circuit with 1 qubit and 1 classical bit
     qc = QuantumCircuit(1, 1)

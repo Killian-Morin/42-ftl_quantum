@@ -16,6 +16,7 @@ def process_result(counts, sim):
 
     return final_counts
 
+
 def entanglement():
     # * Create the circuit with 2 qubits and 1 classical bit
     qc = QuantumCircuit(2, 1)

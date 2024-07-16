@@ -3,25 +3,36 @@ from dotenv import load_dotenv
 
 from qiskit_ibm_runtime import QiskitRuntimeService
 
-load_dotenv()
+def load_account():
+    load_dotenv()
+    token = os.getenv("TOKEN")
+    # Save the account to disk for future use.
+    QiskitRuntimeService.save_account(channel="ibm_quantum", token=token, overwrite=True)
 
-token = os.getenv("TOKEN")
-
-# Save the account to disk for future use.
-QiskitRuntimeService.save_account(channel="ibm_quantum", token=token, overwrite=True)
+load_account()
 
 # Initialize your account with the specified instance to be used
 service = QiskitRuntimeService(instance="ibm-q/open/main")
 
 backends = service.backends()
 
-print("Backends accessible with this account: ")
-for el in backends:
-    if el.simulator:
-        el_type = "simulated"
+underline = '\033[04m'
+blue = '\033[34m'
+purple = '\033[35m'
+reset = '\033[0m'
+
+print(blue, "Backends accessible with this account:", reset)
+for bck in backends:
+    if bck.simulator:
+        bck_type = "simulated"
     else:
-        el_type = "real"
-    status = el.status()
-    date = el.online_date.strftime("%d %b %Y, %I:%M%p")
-    processor_type = el.processor_type["family"]
-    print(f"\t{el.name} | {el_type} quantum computer | pending jobs: {status.pending_jobs} | total number of qubits: {el.num_qubits} | went online on {date} | type of processor: {processor_type}")
+        bck_type = "real"
+    status = bck.status()
+    date = bck.online_date.strftime("%d %b %Y, %I:%M%p")
+    processor_type = bck.processor_type["family"]
+    print(f"\t{purple}{bck.name}{reset} | " +
+            f"{underline}{bck_type}{reset} quantum computer | " +
+            f"pending jobs: {underline}{status.pending_jobs}{reset} | " +
+            f"total number of qubits: {underline}{bck.num_qubits}{reset} | " +
+            f"went online on {underline}{date}{reset} | " +
+            f"type of processor: {underline}{processor_type}{reset}")
