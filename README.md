@@ -1,7 +1,8 @@
 # ftl_quantum
 
-Need a `.env` for it to work.
-The `.env` need a field `TOKEN` with your IBMQ API token that you can get from this: https://quantum.ibm.com/
+My version of the project requires an .env file.
+
+It contains a TOKEN field, whose value is your IMBQ API token, which you can obtain from https://quantum.ibm.com/
 
 ```
 TOKEN=Your token ...
