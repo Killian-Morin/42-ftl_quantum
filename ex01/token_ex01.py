@@ -13,23 +13,32 @@ RESET = '\033[0m'
 
 
 def load_account():
-    # * Take environment variables from .env
-    load_dotenv()
+    """ Load the account associated with the token found in the .env
 
-    # * Get the TOKEN var from the .env that was loaded
+    * Take environment variables from .env
+    * Get the TOKEN var from the .env that was loaded
+
+    * Save the account to disk for future use using the token,
+    * 'overwrite' to 'True' so that the existing account is overwritten
+    """
+
+    load_dotenv()
     token = os.getenv("TOKEN")
 
-    # * Save the account to disk for future use using the token,
-    # * 'overwrite' to 'True' so that the existing account is overwritten
     QiskitRuntimeService.save_account(channel="ibm_quantum", token=token, overwrite=True)
     print(f"{GREEN}Account loaded !\n\n{RESET}")
 
 
 def process_data(service):
-    # * Get all backends accessible via this account
+    """ Print data from the service available
+
+    * Get all backends accessible via this account
+
+    * Print relevent information for each backend obtained
+    """
+
     backends = service.backends()
 
-    # * Print relevent information for each backend obtained
     print(f"{BLUE}Backends accessible with this account:{RESET}")
     for bck in backends:
         if bck.simulator:
@@ -48,8 +57,13 @@ def process_data(service):
 
 
 def main():
-    # * Try to get an instance, need to have the IBMQ account loaded
-    # * If not loaded, call load_account()
+    """
+    * Try to get a service instance, need to have the IBMQ account loaded
+    * If not loaded, call load_account()
+
+    * process_data(service) will print the information about the services available
+    """
+
     try:
         service = QiskitRuntimeService(instance="ibm-q/open/main")
         print(f"{GREEN}No exception, the account was already saved{RESET}\n\n")

@@ -21,17 +21,21 @@ PINK = '\033[95m'
 
 
 def constant_oracle_subject():
-    """ The constant oracle from the subject exemple
+    """ Create the constant oracle from the subject exemple
 
-    saved under 'constant_oracle_subject.png'
+    * Create the QuantumCircuit with 4 qubits
+    * Apply an X gate on the last qubit: q_3
+    * Draw in the terminal and save as constant_oracle_subject.png the circuit
+
+    Return
+    -----
+        qc (QuantumCircuit): representation of the constant oracle quantum circuit
     """
-    # * Create the QuantumCircuit with 4 qubits
+
     qc = QuantumCircuit(NB_QUBITS)
 
-    # * Apply an X gate on the last qubit: q_3
     qc.x(NB_QUBITS - 1)
 
-    # * Draw the circuit
     qc.draw(output="mpl", filename="constant_oracle_subject")
 
     print(f"{GREEN}Created the constant oracle function from the subject{RESET}")
@@ -40,25 +44,29 @@ def constant_oracle_subject():
 
 
 def balanced_oracle_subject():
-    """ The balanced oracle from the subject exemple
+    """ Create the balanced oracle from the subject exemple
 
-    saved under 'balanced_oracle_subject.png'
+    * Create the QuantumCircuit with 4 qubits
+    * Apply an X gate on the first 3 qubits: q_0, q_1 and q_2
+    * Apply three CNOT control gate with q_3 as the control and q_0, q_1 and q_2 as the target
+    * Apply again an X gate on the first 3 qubits: q_0, q_1 and q_2
+    * Draw in the terminal and save as balanced_oracle_subject.png the circuit
+
+    Return
+    -----
+        qc (QuantumCircuit): representation of the balanced oracle quantum circuit
     """
-    # * Create the QuantumCircuit with 4 qubits
+
     qc = QuantumCircuit(NB_QUBITS)
 
-    # * Apply an X gate on the first 3 qubits: q_0, q_1 and q_2
     qc.x([0, 1, 2])
 
-    # * Apply three CNOT control gate with q_3 as the control and q_0, q_1 and q_2 as the target
     qc.cx(0, 3)
     qc.cx(1, 3)
     qc.cx(2, 3)
 
-    # * Apply again an X gate on the first 3 qubits: q_0, q_1 and q_2
     qc.x([0, 1, 2])
 
-    # * Draw the circuit
     qc.draw(output="mpl", filename="balanced_oracle_subject")
 
     print(f"{GREEN}Created the balanced oracle function from the subject{RESET}")
@@ -69,19 +77,29 @@ def balanced_oracle_subject():
 def create_new_oracle_function():
     """ Create a new random oracle function
 
-    saved the constant function under 'constant_oracle_created.png'
-    saved the balanced function under 'balanced_oracle_created.png'
+    * Create a quantum circuit with 4 qubits, 3 input qubits and 1 addditional output qubit
+    * np.random.randint(0, 2) return 0 or 1, so 50% chance to enter in both if
+    * 50% chance of applying an X gate to the output qubit (q_3), flips it to ∣1⟩
+        * 50% chance of returning the circuit as this, making it a constant oracle
+        * The constant oracle circuit is created and saved as constant_oracle_created.png
+    * The next lines of code create a random balanced oracle,
+        * explicative comments on each part (since pretty dense)
+
+    * It finally prints, saves the balanced function under 'balanced_oracle_created.png'
+        * and returns the created balanced circuit
+
+    Return
+    -----
+        qc (QuantumCircuit): representation of the balanced or constant oracle quantum circuit
     """
+
     nb_qubits = 3
-    # * Create a quantum circuit with 4 qubits, 3 input qubits and 1 addditional output qubit
+
     qc = QuantumCircuit(nb_qubits + 1)
 
-    # * np.random.randint(0, 2) return 0 or 1, so 50% chance to enter in both if
     if np.random.randint(0, 2):
-        # * Apply an X gate to the output qubit (q_3), flips it to ∣1⟩
         qc.x(nb_qubits)
     if np.random.randint(0, 2):
-        # * return the circuit as this, making it a constant oracle
         print("Created a random constant oracle function")
         qc.draw(output="mpl", filename="constant_oracle_created")
         return qc
@@ -117,7 +135,7 @@ def create_new_oracle_function():
         qc.mcx(list(range(nb_qubits)), nb_qubits)
         qc = add_cx(qc, f"{state:0b}")
 
-     # * Add a barrier for visualization (optional)
+    # * Add a barrier for visualization (optional)
     qc.barrier()
 
     # * Draw and return the balanced circuit
@@ -126,43 +144,50 @@ def create_new_oracle_function():
     return qc
 
 
-def compile_circuit(function):
+def compile_circuit(oracle_function):
     """ Compiles a circuit for use in the Deutsch-Jozsa algorithm
 
-    saved the first part of the circuit (before composing) in 'temp_circuit.png'
-    saved the composed circuit in 'composed_circuit.png'
+    Param
+    -----
+        oracle_function (QuantumCircuit): the circuit of the oracle function
+
+    * n represent the number of input qubits
+    * The oracle has n input qubits and 1 output qubits
+
+    * Create a temporary circuit with 4 qubits (3 input and 1 output) and 3 classical bits (measurements)
+    * Apply an X gate to the output qubit q_3, his state is ∣1⟩
+    * Apply Hadamard gates to all qubits, each qubits are put in equal superposition state
+    * Add a barrier for visualization (optional)
+    * Draw the temporary circuit before composing it with the oracle, saved as 'temp_circuit.png'
+    * Take the oracle function and apply it to the current circuit
+    * This apply the instructions of the oracle onto the current circuit
+    * Apply Hadamard gates to the input qubits
+    * The state is transformed to an all-zero state (constant function) or a superposition state (balanced function)
+    * Measure the input qubits and store the result in the classical bits
+    * Draw the circuit obtained by the composition, saved as 'composed_circuit.png'
+
+    Return
+    -----
+        qc (QuantumCircuit): representation of the composed oracle function
     """
-    # * n represent the number of input qubits
-    # * The oracle has n input qubits and 1 output qubits
     n = NB_QUBITS - 1
 
-    # * Create a temporary circuit with 4 qubits (3 input and 1 output) and 3 classical bits (measurements)
     qc = QuantumCircuit(n + 1, n)
 
-    # * Apply an X gate to the output qubit q_3, his state is ∣1⟩
     qc.x(n)
 
-    # * Apply Hadamard gates to all qubits, each qubits are put in equal superposition state
     qc.h(range(n + 1))
 
-    # * Add a barrier for visualization (optional)
     qc.barrier()
 
-    # * Draw the temporary circuit before composing it with the oracle
     qc.draw(output="mpl", filename="temp_circuit")
 
-    # * Take the oracle function and apply it to the current circuit
-    # * This apply the instructions of the oracle onto the current circuit
-    qc.compose(function, inplace=True)
+    qc.compose(oracle_function, inplace=True)
 
-    # * Apply Hadamard gates to the input qubits
-    # * The state is transformed to an all-zero state (constant function) or a superposition state (balanced function)
     qc.h(range(n))
 
-    # * Measure the input qubits and store the result in the classical bits
     qc.measure(range(n), range(n))
 
-    # * Draw the circuit obtained by the composition
     qc.draw(output="mpl", filename="composed_circuit")
 
     print(f"{GREEN}Composed the instructions of the oracle on a circuit to use it in the Deutsch-Jozsa algorithm{RESET}")
@@ -170,41 +195,54 @@ def compile_circuit(function):
     return qc
 
 
-def sim_run_algo(function):
-    """ Run the Oracle on a simulator """
+def sim_run_algo(oracle_function):
+    """ Run the Oracle on a simulator
+
+    Param
+    -----
+        oracle_function (QuantumCircuit): the circuit of the oracle function
+
+    * Get an AerSimulator, the method used is automatically selected based on the circuit and noise model
+    * Run the composed circuit on a AerSimulator with 1 shot
+        * with the memory parameter to true in order to have the outcome of the shot as a list
+    * Get the type of AerSimulator that was used
+    * Get the outcome of the first and only shot
+    * Deduce the type of the oracle function (the qubits are in state ∣1⟩ = balanced or in state ∣0⟩ = constant)
+    * Plot the counts result, saved as 'histogram_sim_result'
+    """
 
     print("\nThis will run the circuit on a Qiskit Aer simulator ...")
 
-    # * Get an AerSimulator, the method used is automatically selected based on the circuit and noise model
     sim = AerSimulator(method='automatic')
 
-    # * Run the composed circuit on a AerSimulator with 1 shot
-    # * with the memory parameter to true in order to have the outcome of the shot as a list
-    result = sim.run(function, shots=1, memory=True).result()
+    result = sim.run(oracle_function, shots=1, memory=True).result()
 
-    # * Get the type of AerSimulator that was used
     sim_type = result.results[0].metadata['method']
     print(f"The type of AerSimulator used was {PURPLE}{sim_type} {RESET}\n")
 
-    # * Get the outcome of the first and only shot
     measurements = result.get_memory()
     counts = result.get_counts()
 
-    # * Deduce the type of the oracle function (the qubits are in state ∣1⟩ = balanced or in state ∣0⟩ = constant)
     if "1" in measurements[0]:
         print(f"RESULT - SIMULATOR: The function is {ORANGE}balanced{RESET}, qubits at 1 !\n")
     else:
         print(f"RESULT - SIMULATOR: The function is {ORANGE}constant{RESET}, qubits at 0 !\n")
 
-    # * Plot the counts result
     plot_histogram(counts, title=f"Result of the simulation of type {sim_type}", filename="histogram_sim_result")
 
 
 def get_backend_computer():
-    """  Get a backend quantum computer """
+    """ Get a Service Backend to run the circuit on
 
-    # * Try to get an instance, need to have the IBMQ account loaded
-    # * If not loaded, load the token and save the account
+    * Try to get a service instance, need to have the IBMQ account loaded
+    * If not loaded, call load_account()
+    * Get the least busy and operational backend quantum computer
+
+    Return
+    -----
+        backend (IBMBackend): instance of a backend representing an IBM Quantum Backend
+    """
+
     try:
         service = QiskitRuntimeService(instance="ibm-q/open/main")
         print(f"{GREEN}No exception, the account was already saved{RESET}\n\n")
@@ -215,7 +253,6 @@ def get_backend_computer():
         service = QiskitRuntimeService(channel='ibm_quantum', instance="ibm-q/open/main", token=token)
         QiskitRuntimeService.save_account(channel="ibm_quantum", token=token, overwrite=True)
 
-    # * Get the least busy and operational backend quantum computer and print it
     print("Get the least busy and operational quantum computer ...")
     backend = service.least_busy(operational=True, simulator=False)
     print(f"It's {PURPLE}{backend.name}{RESET}\n")
@@ -223,52 +260,69 @@ def get_backend_computer():
     return backend
 
 
-def real_run_algo(function):
+def real_run_algo(oracle_function):
+    """ Run the oracle on a real quantum hardware
+
+    Param
+    -----
+        oracle_function (QuantumCircuit): the circuit of the oracle function
+
+    * Optimize the circuit created for the particular backend obtained
+    * Convert to an Instruction Set Architecture (ISA) circuit
+        * ISA = the set of instructions the device can understand and execute
+    * Draw the circuit after being converted, saved as 'circuit_optimized'
+    * Get a Primitive, here SamplerV2, for the particular backend obtained
+        * https://docs.quantum.ibm.com/api/qiskit/primitives
+    * Run the circuit using the Primitive instantiated with the backend shots times
+        * Here 'isa_circuit' is considered a Primitive Unified Bloc (PUB)
+    * Get the result of the first PUB, this gives a PubResult object
+    * In the PubResult, get the data attribute, inside it there are the classical bits
+        * The way I instantiate the QuantumCircuit, the ClassicalRegister get the name 'c'
+        * we use this name to get their content
+    * Plot the result in a histogram, saved as 'histogram_real_result_{job_id}'
+
+    """
+
     print("\nThis will run the circuit on a real quantum computer ...")
 
     bck = get_backend_computer()
 
-    # * Optimize the circuit created for the particular backend obtained
-    # * Convert to an Instruction Set Architecture (ISA) circuit
-    # * ISA = the set of instructions the device can understand and execute
     pm = generate_preset_pass_manager(backend=bck, optimization_level=1)
-    isa_circuit = pm.run(function)
+    isa_circuit = pm.run(oracle_function)
 
-    # * Draw the circuit after being converted
     isa_circuit.draw('mpl', idle_wires=False, filename="circuit_optimized")
 
-    # * Get a Primitive, here Sampler, for the particular backend obtained
-    # * https://docs.quantum.ibm.com/api/qiskit/primitives
     sampler = Sampler(bck)
 
-    # * Run the circuit using the Primitive instantiated with the backend shots times
-    # * Here 'isa_circuit' is considered a Primitive Unified Bloc (PUB)
     job = sampler.run([isa_circuit], shots=1)
 
-    # * Get the job_id of the execution
     job_id = job.job_id()
 
-    # * Print basic information on the job
     print(f"Job ID: {job_id}\n")
     print(f"Job Status: {job.status()}\n")
 
-    # * Get the result of the first PUB, this gives a PubResult object
     result = job.result()[0]
 
-    # * In the PubResult, get the data attribute, inside it there are the classical bits
-    # * The way I instantiate the QuantumCircuit, the ClassicalRegister get the name 'c'
-    # * we use this name to get their content
     pub_result = result.data.c.get_counts()
 
     print(f"{RED}{result.get_counts()}{RESET}")
     print(f"{RED}{pub_result}{RESET}")
 
-    # * Plot the result in a histogram
-    plot_histogram(pub_result, title=f"Result of {job_id} runned on {bck.name} real quantum computer",
-                   filename=f"histogram_real_result_{job_id}")
+    title = f"Result of {job_id} runned on {bck.name} real quantum computer"
+    plot_histogram(pub_result, title=title, filename=f"histogram_real_result_{job_id}")
 
 
 def main():
+    """ main function to determine what oracle to use, then run the circuit
+
+    * Gives the choice of using the constant, balanced oracle of the subject,
+        * create a new oracle function or the function provided in the correction
+    * Get the oracle function depending on the choice
+    * Compile the oracle function to use it in the algorithm
+    * Run the circuit on a simulator
+    * Gives the choice to run the circuit on a real computer
+    """
+
     print(f"{BLUE}What oracle function do you want to use ? Options are:{RESET}")
     print(f"\tconstant oracle from the subject ({PINK}option 1{RESET})")
     print(f"\tbalanced oracle from the subject ({PINK}option 2{RESET})")
@@ -277,7 +331,6 @@ def main():
 
     choice = input()
 
-    # * Get the oracle function depending on the choice
     if choice == "1":
         oracle_function = constant_oracle_subject()
     elif choice == "2":
@@ -294,15 +347,12 @@ def main():
         print(f"{RED}Please try again\n\n{RESET}")
         main()
 
-    # * Compile the oracle function to use it in the algorithm
     circuit_compiled = compile_circuit(oracle_function)
 
-    # * Run the circuit on a simulator
     sim_run_algo(circuit_compiled)
 
     real_run = input(f"{BLUE}Do you want to run this circuit on a real quantum computer ? (y or n): {RESET}")
 
-    # * Depending on the choice, run the circuit on a real computer
     if real_run == "y":
         real_run_algo(circuit_compiled)
     else:
