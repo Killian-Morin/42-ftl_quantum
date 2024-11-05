@@ -83,7 +83,7 @@ def superposition():
     final_counts = process_result(counts, sim_type)
 
     title = f"Measurement result of the plus state $|+\\rangle$ with {SHOTS} shots ({sim_type})"
-    plot_histogram(final_counts, title=title, filename="histogram_plus_state")
+    plot_histogram(final_counts, title=title, filename="histogram_plus_state", figsize=(10, 6))
 
 
 if __name__ == "__main__":

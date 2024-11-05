@@ -103,7 +103,7 @@ def entanglement():
     final_counts = process_result(counts, sim_type)
 
     title = rf"Measurement result of the $\Phi^+$ Bell state with {SHOTS} shots ({sim_type})"
-    plot_histogram(final_counts, title=title, filename="histogram_Phi_plus")
+    plot_histogram(final_counts, title=title, filename="histogram_Phi_plus", figsize=(10, 6))
 
     # statevector = result.get_statevector(qc)
     # plot_state_city(statevector, title=r"$\Phi^+$ Bell state", alpha=0.5, filename="cityscape_Phi_plus", color=['midnightblue', 'crimson'])

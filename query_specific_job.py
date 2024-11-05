@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 
 from qiskit_ibm_runtime import QiskitRuntimeService
 from qiskit.visualization import plot_histogram
-from qiskit.exceptions import RuntimeJobNotFound
+from qiskit.exceptions import *
 
 
 RED = '\033[31m'
@@ -101,7 +101,7 @@ def query_job():
 
     # * Plot the result in a histogram
     title = rf"Result of {job_id} with {shots} shots runned on {bck_name})"
-    plot_histogram(result_percentage, title=title, filename=f"histogram_{job_id}_{bck_name}")
+    plot_histogram(result_percentage, title=title, filename=f"histogram_{job_id}_{bck_name}", figsize=(10, 6))
 
 
 if __name__ == "__main__":

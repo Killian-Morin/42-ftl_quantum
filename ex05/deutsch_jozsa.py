@@ -36,7 +36,8 @@ def constant_oracle_subject():
 
     qc.x(NB_QUBITS - 1)
 
-    qc.draw(output="mpl", filename="constant_oracle_subject")
+    title = "Constant Oracle function from the subject"
+    qc.draw(output="mpl", title=title, filename="constant_oracle_subject")
 
     print(f"{GREEN}Created the constant oracle function from the subject{RESET}")
 
@@ -67,7 +68,8 @@ def balanced_oracle_subject():
 
     qc.x([0, 1, 2])
 
-    qc.draw(output="mpl", filename="balanced_oracle_subject")
+    title = "Balanced Oracle function from the subject"
+    qc.draw(output="mpl", title=title, filename="balanced_oracle_subject")
 
     print(f"{GREEN}Created the balanced oracle function from the subject{RESET}")
 
@@ -101,7 +103,8 @@ def create_new_oracle_function():
         qc.x(nb_qubits)
     if np.random.randint(0, 2):
         print("Created a random constant oracle function")
-        qc.draw(output="mpl", filename="constant_oracle_created")
+        title = "Constant oracle function created"
+        qc.draw(output="mpl", title=title, filename="constant_oracle_created")
         return qc
 
     # * nb.random.choice() to select half of the possible input states (2^(3) = 8 states)
@@ -140,7 +143,8 @@ def create_new_oracle_function():
 
     # * Draw and return the balanced circuit
     print(f"{GREEN}Created a random balanced oracle function{RESET}")
-    qc.draw(output="mpl", filename="balanced_oracle_created")
+    title = "Balanced Oracle function randomly created"
+    qc.draw(output="mpl", title=title, filename="balanced_oracle_created")
     return qc
 
 
@@ -180,7 +184,8 @@ def compile_circuit(oracle_function):
 
     qc.barrier()
 
-    qc.draw(output="mpl", filename="temp_circuit")
+    title = "Temporary circuit before composing with the oracle function"
+    qc.draw(output="mpl", title=title, filename="temp_circuit")
 
     qc.compose(oracle_function, inplace=True)
 
@@ -188,7 +193,8 @@ def compile_circuit(oracle_function):
 
     qc.measure(range(n), range(n))
 
-    qc.draw(output="mpl", filename="composed_circuit")
+    title = "Composed circuit"
+    qc.draw(output="mpl", title=title, filename="composed_circuit")
 
     print(f"{GREEN}Composed the instructions of the oracle on a circuit to use it in the Deutsch-Jozsa algorithm{RESET}")
 
@@ -223,12 +229,15 @@ def sim_run_algo(oracle_function):
     measurements = result.get_memory()
     counts = result.get_counts()
 
+    print(f"\n\n{measurements}\n\n")
+
     if "1" in measurements[0]:
         print(f"RESULT - SIMULATOR: The function is {ORANGE}balanced{RESET}, qubits at 1 !\n")
     else:
         print(f"RESULT - SIMULATOR: The function is {ORANGE}constant{RESET}, qubits at 0 !\n")
 
-    plot_histogram(counts, title=f"Result of the simulation of type {sim_type}", filename="histogram_sim_result")
+    title=f"Result of the simulation of type {sim_type}"
+    plot_histogram(counts, title=title, filename="histogram_sim_result", figsize=(10, 6))
 
 
 def get_backend_computer():
@@ -290,7 +299,7 @@ def real_run_algo(oracle_function):
     pm = generate_preset_pass_manager(backend=bck, optimization_level=1)
     isa_circuit = pm.run(oracle_function)
 
-    isa_circuit.draw('mpl', idle_wires=False, filename="circuit_optimized")
+    isa_circuit.draw('mpl', idle_wires=False, filename="circuit_optimized", figsize=(10, 6))
 
     sampler = Sampler(bck)
 
@@ -309,7 +318,7 @@ def real_run_algo(oracle_function):
     print(f"{RED}{pub_result}{RESET}")
 
     title = f"Result of {job_id} runned on {bck.name} real quantum computer"
-    plot_histogram(pub_result, title=title, filename=f"histogram_real_result_{job_id}")
+    plot_histogram(pub_result, title=title, filename=f"histogram_real_result_{job_id}", figsize=(10, 6))
 
 
 def main():

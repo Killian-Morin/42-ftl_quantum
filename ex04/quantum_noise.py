@@ -56,7 +56,8 @@ def create_circuit():
     qc.cx(0, 1)
 
     ideal_distribution = Statevector.from_instruction(qc).probabilities_dict()
-    plot_histogram(ideal_distribution, title="Ideal distribution of this circuit", filename="ideal_dist_Phi_plus")
+    title = "Ideal distribution of this circuit"
+    plot_histogram(ideal_distribution, title=title, filename="ideal_dist_Phi_plus", figsize=(10, 6))
 
     # qc.measure([0, 1], [0, 1])
     qc.measure_all()
@@ -193,7 +194,7 @@ def render_result(counts, bck, job):
 
     title = rf"Measurement result of the $\Phi^+$ Bell state with {SHOTS} shots runned on {bck.name}"
     job_id = job.job_id()
-    plot_histogram(counts, title=title, filename=f"histogram_Phi_plus_{job_id}")
+    plot_histogram(counts, title=title, filename=f"histogram_Phi_plus_{job_id}", figsize=(10, 6))
 
 
 def entanglement_real():
