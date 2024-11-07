@@ -65,8 +65,8 @@ The goal of this exercice is to discover what is **quantum noise**. This 'noise'
 Those intermediary states leads to unexpected results among the possible quantum states. In the histogram for quantum hardware, the noise corresponds to the states `01` and `10`.
 
 Results with a simulator (ex03)  |  Results with quantum hardware (ex04)
-:-------------------------:|:-------------------------:
-![](data/img/entanglement.png)  |  ![](data/img/quantum_noise.png)
+:-------------:|:-------------:
+![entanglement](data/img/entanglement.png) | ![quantum noise](data/img/quantum_noise.png)
 
 > “The main source of failure in a quantum computer is noise, which comes from rogue forms of energy creeping into the quantum computer making the qubits drift away from where they should be and causing errors.” https://www.youtube.com/watch?v=-UlxHPIEVqA&t=1400s
 
@@ -174,6 +174,25 @@ At step 5. we do the inverse operation of step 2., we would end up with the quan
 
 If we execute the algorithm on a real computer and not a simulator we would have to account for _noise_. We couldn't get back the oracle type with certainty, unlike with the execution on a simulator.
 
+## Résultats
+
+### Constant
+
+The qubits are at `0` when the Oracle is **constant**.
+
+Results with a simulator | Results with real quantum hardware
+:-------------:|:-------------:
+![Deutsch-Jozsa constant oracle result (simulateur)](data/img/deutsch_jozsa_constant_result_sim.png) | ![Deutsch-Jozsa constant oracle result (hardware)](data/img/deutsch_jozsa_constant_result.png)
+
+### Balanced
+
+The qubits are at `1` when the Oracle is **balanced**.
+
+Results with a simulator | Results with real quantum hardware
+:-------------:|:-------------:
+![Deutsch-Jozsa balanced oracle result (simulateur)](data/img/deutsch_jozsa_balanced_result_sim.png) | ![Deutsch-Jozsa balanced oracle result (hardware)](data/img/deutsch_jozsa_balanced_result.png)
+
+
 <details>
   <summary>Sources</summary>
 
@@ -209,7 +228,7 @@ From what I can tell, this exercice is an implementation of the Grover's algorit
   [Algorithme de Grover - Wikipedia](https://fr.wikipedia.org/wiki/Algorithme_de_Grover)
 </details>
 
-# Globals resources
+# Documentation
 
 ## List given in the subject
 [Julien Bobroff’s conference at USI on quantum levitation (in French) - Youtube](https://www.youtube.com/watch?v=6kg2yV_3B1Q)

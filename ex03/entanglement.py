@@ -12,38 +12,40 @@ RESET = '\033[0m'
 SHOTS = 500
 
 
-def process_result(counts, sim):
-    """ Process the result from the simulation, print the results/values
+def process_result(counts, sim_type):
+    """ Process the result from the simulation, print and plot the results
 
     Params
     -----
         counts (dict): holds the result of the simulation for the case '0' and '1'
-        sim (str): type of simulator used
+        sim_type (str): type of simulator used
 
     * Print the occurences for both states for the total shots
+    * Plot an histogram for the counts result of the simulation
     * Divide the occurence of the states by the number of shots
     *   and print the result as a total of 1
-
-    Return
-    -----
-        final_counts (dict): the result of each state as percentage of 1, to be used in the histogram
+    * Plot an histogram for the percentage result of the simulation
     """
 
     print(f"\n{ORANGE}============================={RESET}")
 
-    print(f"{BLUE}Measurements results ({sim} simulator):{RESET}")
+    print(f"{BLUE}Measurements results ({sim_type} simulator):{RESET}")
     print(f"\tfor the 00 state: {PURPLE}{counts['0']}{RESET}")
     print(f"\tfor the 11 state: {PURPLE}{counts['1']}{RESET}\n")
+
+    title = f"Counts measurement result obtained for the $\Phi^+$ Bell state with {SHOTS} shots on AerSimulator with method {sim_type}"
+    plot_histogram(counts, title=title, filename="histogram_Phi_plus_counts", figsize=(12, 8))
 
     final_counts = {
         '00': counts['0'] / SHOTS,
         '11': counts['1'] / SHOTS
     }
-    print(f"{BLUE}Measurements results as percentage of 1 ({sim} simulator):{RESET}")
+    print(f"{BLUE}Measurements results as percentage of 1 ({sim_type} simulator):{RESET}")
     print(f"\tfor the 00 state: {GREEN}{final_counts['00']}{RESET}")
     print(f"\tfor the 11 state: {GREEN}{final_counts['11']}{RESET}\n")
 
-    return final_counts
+    title = rf"Percentage measurement result obtained for the $\Phi^+$ Bell state with {SHOTS} shots on AerSimulator with method {sim_type}"
+    plot_histogram(final_counts, title=title, filename="histogram_Phi_plus_percentage", figsize=(12, 8))
 
 
 def entanglement():
@@ -65,8 +67,7 @@ def entanglement():
     * Transpile (i.e. adapt) the circuit for the simulator obtained
     * Run the circuit on the simulator with a precise number of shots
     * Get the type of simulator that was used since the method was 'automatic'
-    * Process the result
-    * Plot the result in a histogram that will be saved in a .png file
+    * Process (print and plot) the result
 
     For the probabilities state of the qubits after the run
     * Get the state of the qubits as they were before the measurement,
@@ -100,10 +101,8 @@ def entanglement():
     sim_type = result.results[0].metadata['method']
 
     counts = result.get_counts()
-    final_counts = process_result(counts, sim_type)
 
-    title = rf"Measurement result of the $\Phi^+$ Bell state with {SHOTS} shots ({sim_type})"
-    plot_histogram(final_counts, title=title, filename="histogram_Phi_plus", figsize=(10, 6))
+    process_result(counts, sim_type)
 
     # statevector = result.get_statevector(qc)
     # plot_state_city(statevector, title=r"$\Phi^+$ Bell state", alpha=0.5, filename="cityscape_Phi_plus", color=['midnightblue', 'crimson'])

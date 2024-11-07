@@ -3,7 +3,6 @@ from dotenv import load_dotenv
 
 from qiskit_ibm_runtime import QiskitRuntimeService
 from qiskit.visualization import plot_histogram
-from qiskit.exceptions import *
 
 
 RED = '\033[31m'
@@ -49,7 +48,7 @@ def query_job():
     print(f"All jobs runned on this account:")
     for job in all_jobs:
         job_date = job.creation_date.strftime("%d %b %Y, %I:%M%p %Z")
-        print(f"job runned in {ORANGE}{job.backend().name}{RESET}, id: {ORANGE}{job.job_id()}{RESET}, created at: {job_date}")
+        print(f"job runned on {ORANGE}{job.backend().name}{RESET}, id: {ORANGE}{job.job_id()}{RESET}, created at: {job_date}")
 
     # * Gives the choice of which job to get more data
     job_id = input(f"\n{BLUE}Prompt to get info for: {RESET}")
@@ -57,8 +56,9 @@ def query_job():
     # * Get the job saved under the job_id, it should be a RuntimeJobV2 object
     try:
         job = service.job(job_id)
-    except RuntimeJobNotFound as e:
-        print(e)
+    except Exception as e:
+        print(f"{RED}{e}{RESET}")
+        return
 
     # * If the job is valid, get the result of the first PUB of it
     job_result = job.result()[0]
@@ -84,14 +84,17 @@ def query_job():
     # * Sort the dict of the results by keys
     pub_result = dict(sorted(pub_result.items()))
 
-    # * Print the occurences for the four states for the 500 shots with the name of the backend
+    # * Print the occurences for all states with the number of shots runned with the name of the backend
     print(f"{BLUE}Measurement results info on a total of {shots} shots (runned on {bck_name}):{RESET}")
     for state, result in pub_result.items():
         print(f"\tfor the {state} state: {PURPLE}{result}{RESET}")
 
-    # * Create a dict with the states as keys and values (occurence of the states) by the number of shots
+    # * Create a dict for the counts, for each states: number of occurences
+    # * Create a dict for the percentage, for each states: number of occurences / number of shots
+    result_counts = dict()
     result_percentage = dict()
     for state, result in pub_result.items():
+        result_counts[state] = result
         result_percentage[state] = result / shots
 
     # * Print the result with a total of 1
@@ -99,9 +102,13 @@ def query_job():
     for state, result in result_percentage.items():
         print(f"\tfor the {state} state: {GREEN}{result}{RESET}")
 
-    # * Plot the result in a histogram
-    title = rf"Result of {job_id} with {shots} shots runned on {bck_name})"
-    plot_histogram(result_percentage, title=title, filename=f"histogram_{job_id}_{bck_name}", figsize=(10, 6))
+    # * Plot the counts result in a histogram
+    title = rf"Counts result of {job_id} with {shots} shots runned on {bck_name}"
+    plot_histogram(result_counts, title=title, filename=f"histogram_counts_{job_id}_{bck_name}", figsize=(12, 8))
+
+    # * Plot the percentage result in a histogram
+    title = rf"Percentage result of {job_id} with {shots} shots runned on {bck_name}"
+    plot_histogram(result_percentage, title=title, filename=f"histogram_percentage_{job_id}_{bck_name}", figsize=(12, 8))
 
 
 if __name__ == "__main__":

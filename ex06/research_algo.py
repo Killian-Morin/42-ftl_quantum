@@ -35,7 +35,8 @@ def get_backend_computer():
     # * Get the least busy and operational backend quantum computer and print it
     print("Get the least busy and operational quantum computer ...")
     backend = service.least_busy(operational=True, simulator=False)
-    print(f"It's {PURPLE}{backend.name}{RESET}\n")
+    backend_status = backend.status()
+    print(f"It's {PURPLE}{backend.name}{RESET} ({backend_status.pending_jobs} pending jobs)\n")
 
     return backend
 

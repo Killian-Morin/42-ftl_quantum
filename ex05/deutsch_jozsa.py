@@ -1,4 +1,5 @@
 import os
+import sys
 import numpy as np
 from dotenv import load_dotenv
 
@@ -10,6 +11,7 @@ from qiskit.transpiler.preset_passmanagers import generate_preset_pass_manager
 
 
 NB_QUBITS = 4
+SHOTS = 500
 
 RESET = '\033[0m'
 GREEN = '\033[32m'
@@ -18,6 +20,7 @@ ORANGE = '\033[33m'
 BLUE = '\033[34m'
 PURPLE = '\033[35m'
 PINK = '\033[95m'
+BOLD = '\033[01m'
 
 
 def constant_oracle_subject():
@@ -36,8 +39,7 @@ def constant_oracle_subject():
 
     qc.x(NB_QUBITS - 1)
 
-    title = "Constant Oracle function from the subject"
-    qc.draw(output="mpl", title=title, filename="constant_oracle_subject")
+    qc.draw(output="mpl", filename="constant_oracle_subject")
 
     print(f"{GREEN}Created the constant oracle function from the subject{RESET}")
 
@@ -49,7 +51,7 @@ def balanced_oracle_subject():
 
     * Create the QuantumCircuit with 4 qubits
     * Apply an X gate on the first 3 qubits: q_0, q_1 and q_2
-    * Apply three CNOT control gate with q_3 as the control and q_0, q_1 and q_2 as the target
+    * Apply three CNOT control gate with q_3 as the target and q_0, q_1 and q_2 as the controller
     * Apply again an X gate on the first 3 qubits: q_0, q_1 and q_2
     * Draw in the terminal and save as balanced_oracle_subject.png the circuit
 
@@ -68,83 +70,10 @@ def balanced_oracle_subject():
 
     qc.x([0, 1, 2])
 
-    title = "Balanced Oracle function from the subject"
-    qc.draw(output="mpl", title=title, filename="balanced_oracle_subject")
+    qc.draw(output="mpl", filename="balanced_oracle_subject")
 
     print(f"{GREEN}Created the balanced oracle function from the subject{RESET}")
 
-    return qc
-
-
-def create_new_oracle_function():
-    """ Create a new random oracle function
-
-    * Create a quantum circuit with 4 qubits, 3 input qubits and 1 addditional output qubit
-    * np.random.randint(0, 2) return 0 or 1, so 50% chance to enter in both if
-    * 50% chance of applying an X gate to the output qubit (q_3), flips it to ∣1⟩
-        * 50% chance of returning the circuit as this, making it a constant oracle
-        * The constant oracle circuit is created and saved as constant_oracle_created.png
-    * The next lines of code create a random balanced oracle,
-        * explicative comments on each part (since pretty dense)
-
-    * It finally prints, saves the balanced function under 'balanced_oracle_created.png'
-        * and returns the created balanced circuit
-
-    Return
-    -----
-        qc (QuantumCircuit): representation of the balanced or constant oracle quantum circuit
-    """
-
-    nb_qubits = 3
-
-    qc = QuantumCircuit(nb_qubits + 1)
-
-    if np.random.randint(0, 2):
-        qc.x(nb_qubits)
-    if np.random.randint(0, 2):
-        print("Created a random constant oracle function")
-        title = "Constant oracle function created"
-        qc.draw(output="mpl", title=title, filename="constant_oracle_created")
-        return qc
-
-    # * nb.random.choice() to select half of the possible input states (2^(3) = 8 states)
-    # * range(2**nb_qubits) -> generates all possible states for the input qubits (from 0 to 2^(nb_qubits) - 1 so 7)
-    # * 2**nb_qubits // 2 -> calculates half of these states (8 / 2 = 4)
-    # * replace=False -> so that each state are only sampled once
-    on_states = np.random.choice(
-        range(2**nb_qubits),
-        2**nb_qubits // 2,
-        replace=False,
-    )
-
-    # * Helper function that applies X gates to specific qubits based on a bit string
-    # * take the circuit and a bit string as parameter
-    # * iterates over the bit string and for each bit that is '1' apply an X gate to the corresponding qubit
-    # * the bit string is reversed to match the qubit numbering
-    def add_cx(qc, bit_string):
-        for qubit, bit in enumerate(reversed(bit_string)):
-            if bit == "1":
-                qc.x(qubit)
-        return qc
-
-    # * For each state, a barrier is added for visualization (optional)
-    # * Call add_cx to prepare the qubit in the state specified by the binary representation of the state,
-    # *     f"{state:0b}" to convert the state to a binary string
-    # * Apply a multi-controlled X gate (MCX) to flip the output qubit if all input qubits are in the specified state
-    # * Call add_cx again to uncompute the input state, this returns the input qubits to the ∣0⟩ state
-    for state in on_states:
-        qc.barrier()
-        qc = add_cx(qc, f"{state:0b}")
-        qc.mcx(list(range(nb_qubits)), nb_qubits)
-        qc = add_cx(qc, f"{state:0b}")
-
-    # * Add a barrier for visualization (optional)
-    qc.barrier()
-
-    # * Draw and return the balanced circuit
-    print(f"{GREEN}Created a random balanced oracle function{RESET}")
-    title = "Balanced Oracle function randomly created"
-    qc.draw(output="mpl", title=title, filename="balanced_oracle_created")
     return qc
 
 
@@ -161,14 +90,15 @@ def compile_circuit(oracle_function):
     * Create a temporary circuit with 4 qubits (3 input and 1 output) and 3 classical bits (measurements)
     * Apply an X gate to the output qubit q_3, his state is ∣1⟩
     * Apply Hadamard gates to all qubits, each qubits are put in equal superposition state
-    * Add a barrier for visualization (optional)
-    * Draw the temporary circuit before composing it with the oracle, saved as 'temp_circuit.png'
+    * Add a barrier for visualization to separate from the beginning of the oracle
     * Take the oracle function and apply it to the current circuit
-    * This apply the instructions of the oracle onto the current circuit
+        * This apply the instructions of the oracle onto the current circuit
+    * Add a barrier for visualization to separate from the end of the oracle
     * Apply Hadamard gates to the input qubits
     * The state is transformed to an all-zero state (constant function) or a superposition state (balanced function)
     * Measure the input qubits and store the result in the classical bits
     * Draw the circuit obtained by the composition, saved as 'composed_circuit.png'
+        * the part between the barriers is the oracle function
 
     Return
     -----
@@ -184,24 +114,22 @@ def compile_circuit(oracle_function):
 
     qc.barrier()
 
-    title = "Temporary circuit before composing with the oracle function"
-    qc.draw(output="mpl", title=title, filename="temp_circuit")
-
     qc.compose(oracle_function, inplace=True)
+
+    qc.barrier()
 
     qc.h(range(n))
 
     qc.measure(range(n), range(n))
 
-    title = "Composed circuit"
-    qc.draw(output="mpl", title=title, filename="composed_circuit")
+    qc.draw(output="mpl", filename="composed_circuit")
 
-    print(f"{GREEN}Composed the instructions of the oracle on a circuit to use it in the Deutsch-Jozsa algorithm{RESET}")
+    print(f"Composed the instructions of the oracle on a circuit to use it in the Deutsch-Jozsa algorithm")
 
     return qc
 
 
-def sim_run_algo(oracle_function):
+def sim_run_oracle(oracle_function):
     """ Run the Oracle on a simulator
 
     Param
@@ -212,16 +140,17 @@ def sim_run_algo(oracle_function):
     * Run the composed circuit on a AerSimulator with 1 shot
         * with the memory parameter to true in order to have the outcome of the shot as a list
     * Get the type of AerSimulator that was used
-    * Get the outcome of the first and only shot
-    * Deduce the type of the oracle function (the qubits are in state ∣1⟩ = balanced or in state ∣0⟩ = constant)
-    * Plot the counts result, saved as 'histogram_sim_result'
+    * Get the outcome of the shots
+    * Deduce the type of the oracle function
+    *   if one of the state is in ∣1⟩ then balanced or if they are none ∣0⟩ = constant)
+    * Plot the counts result
     """
 
     print("\nThis will run the circuit on a Qiskit Aer simulator ...")
 
     sim = AerSimulator(method='automatic')
 
-    result = sim.run(oracle_function, shots=1, memory=True).result()
+    result = sim.run(oracle_function, shots=SHOTS, memory=True).result()
 
     sim_type = result.results[0].metadata['method']
     print(f"The type of AerSimulator used was {PURPLE}{sim_type} {RESET}\n")
@@ -229,15 +158,15 @@ def sim_run_algo(oracle_function):
     measurements = result.get_memory()
     counts = result.get_counts()
 
-    print(f"\n\n{measurements}\n\n")
+    print(f"The measurements for the q_0, q_1 and q_2 are: {ORANGE}{measurements}{RESET}\n")
 
     if "1" in measurements[0]:
-        print(f"RESULT - SIMULATOR: The function is {ORANGE}balanced{RESET}, qubits at 1 !\n")
+        print(f"{RED}RESULT - SIMULATOR{RESET}: The function is {ORANGE}balanced{RESET}, some qubits at 1 !\n")
     else:
-        print(f"RESULT - SIMULATOR: The function is {ORANGE}constant{RESET}, qubits at 0 !\n")
+        print(f"{RED}RESULT - SIMULATOR{RESET}: The function is {ORANGE}constant{RESET}, all qubits at 0 !\n")
 
-    title=f"Result of the simulation of type {sim_type}"
-    plot_histogram(counts, title=title, filename="histogram_sim_result", figsize=(10, 6))
+    title=f"Counts measurement result for the simulation of type {sim_type}"
+    plot_histogram(counts, title=title, filename="histogram_sim_counts", figsize=(12, 8))
 
 
 def get_backend_computer():
@@ -254,22 +183,24 @@ def get_backend_computer():
 
     try:
         service = QiskitRuntimeService(instance="ibm-q/open/main")
-        print(f"{GREEN}No exception, the account was already saved{RESET}\n\n")
+        print(f"{GREEN}No exception, the account was already saved{RESET}\n")
     except Exception:
         print(f"{RED}Exception catched, the account was not saved and needs to be loaded{RESET}")
         load_dotenv()
         token = os.getenv("TOKEN")
         service = QiskitRuntimeService(channel='ibm_quantum', instance="ibm-q/open/main", token=token)
         QiskitRuntimeService.save_account(channel="ibm_quantum", token=token, overwrite=True)
+        print(f"{GREEN}Account loaded{RESET}")
 
     print("Get the least busy and operational quantum computer ...")
     backend = service.least_busy(operational=True, simulator=False)
-    print(f"It's {PURPLE}{backend.name}{RESET}\n")
+    backend_status = backend.status()
+    print(f"It's {PURPLE}{backend.name}{RESET} ({backend_status.pending_jobs} pending jobs)\n")
 
     return backend
 
 
-def real_run_algo(oracle_function):
+def real_run_oracle(oracle_function):
     """ Run the oracle on a real quantum hardware
 
     Param
@@ -299,11 +230,11 @@ def real_run_algo(oracle_function):
     pm = generate_preset_pass_manager(backend=bck, optimization_level=1)
     isa_circuit = pm.run(oracle_function)
 
-    isa_circuit.draw('mpl', idle_wires=False, filename="circuit_optimized", figsize=(10, 6))
+    isa_circuit.draw('mpl', idle_wires=False, filename="circuit_optimized_for_back")
 
     sampler = Sampler(bck)
 
-    job = sampler.run([isa_circuit], shots=1)
+    job = sampler.run([isa_circuit], shots=SHOTS)
 
     job_id = job.job_id()
 
@@ -312,58 +243,59 @@ def real_run_algo(oracle_function):
 
     result = job.result()[0]
 
-    pub_result = result.data.c.get_counts()
+    classical_bits_name = oracle_function.cregs[0].name
 
-    print(f"{RED}{result.get_counts()}{RESET}")
-    print(f"{RED}{pub_result}{RESET}")
+    counts = getattr(result.data, classical_bits_name).get_counts()
 
-    title = f"Result of {job_id} runned on {bck.name} real quantum computer"
-    plot_histogram(pub_result, title=title, filename=f"histogram_real_result_{job_id}", figsize=(10, 6))
+    # try:
+    #     counts = result.data.c.get_counts()
+    #     print(f"The classical bits/result was in {BOLD}c{RESET}")
+    # except Exception:
+    #     counts = result.data.meas.get_counts()
+    #     print(f"The classical bits/result was in {BOLD}meas{RESET}")
+
+    print(f"{RED}RESULT - HARDWARE{RESET}: with {SHOTS} the qubits are at {counts}")
+
+    title = f"Counts measurement result of {job_id} runned on {bck.name} real quantum computer"
+    plot_histogram(counts, title=title, filename=f"histogram_real_counts_{job_id}", figsize=(12, 8))
 
 
 def main():
-    """ main function to determine what oracle to use, then run the circuit
+    """ main function to build the circuit for the oracle
 
-    * Gives the choice of using the constant, balanced oracle of the subject,
-        * create a new oracle function or the function provided in the correction
+    * Assert the arguments, need 1: 'constant', 'balanced' or 'eval'
     * Get the oracle function depending on the choice
     * Compile the oracle function to use it in the algorithm
     * Run the circuit on a simulator
     * Gives the choice to run the circuit on a real computer
     """
 
-    print(f"{BLUE}What oracle function do you want to use ? Options are:{RESET}")
-    print(f"\tconstant oracle from the subject ({PINK}option 1{RESET})")
-    print(f"\tbalanced oracle from the subject ({PINK}option 2{RESET})")
-    print(f"\tcreate a new oracle function that has a 50% percent chance of being constant or balanced ({PINK}option 3{RESET})")
-    print(f"\tthe function that will be provided from the correction ({PINK}option 4{RESET})")
+    assert len(sys.argv) == 2, f"{RED}Expect one argument: 'constant', 'balanced' or 'eval' if it's implemented{RESET}"
 
-    choice = input()
+    assert sys.argv[1] == "constant" or sys.argv[1] == "balanced" or sys.argv[1] == "eval", \
+            f"{RED}Expect a valid argument: 'constant', 'balanced' or 'eval' if it's implemented{RESET}"
 
-    if choice == "1":
+    choice = sys.argv[1]
+
+    if choice == "constant":
         oracle_function = constant_oracle_subject()
-    elif choice == "2":
+    elif choice == "balanced":
         oracle_function = balanced_oracle_subject()
-    elif choice == "3":
-        oracle_function = create_new_oracle_function()
     # ? FOR THE ORACLE FUNCTION GIVEN IN THE CORRECTION
-    # elif choice == "4":
-    #     oracle_function = FUNCTION CALL
-    #     print("\nThe oracle function of the correction (view it in correction_oracle_function.png)")
-    #     oracle_function.draw(output="mpl", filename="correction_oracle_function")
-    else:
-        os.system("clear")
-        print(f"{RED}Please try again\n\n{RESET}")
-        main()
+    elif choice == "eval":
+        # oracle_function = FUNCTION CALL
+        # print("\nThe oracle function of the correction (view it in correction_oracle_function.png)")
+        # oracle_function.draw(output="mpl", filename="correction_oracle_function")
+        return
 
     circuit_compiled = compile_circuit(oracle_function)
 
-    sim_run_algo(circuit_compiled)
+    sim_run_oracle(circuit_compiled)
 
     real_run = input(f"{BLUE}Do you want to run this circuit on a real quantum computer ? (y or n): {RESET}")
 
     if real_run == "y":
-        real_run_algo(circuit_compiled)
+        real_run_oracle(circuit_compiled)
     else:
         print("\nFine, this is the end of this run of the Deutsch-Jozsa algorithm\n")
 

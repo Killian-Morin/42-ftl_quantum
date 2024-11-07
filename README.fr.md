@@ -64,9 +64,9 @@ Le but de cet exercice est de découvrir ce qu'est le **Quantum noise**. C'est d
 
 Cela provoque des resultats auxquels on ne s'attend pas parmi les états quantiques possibles (dans l'histogramme pour l'ordinateur quantique, cela correspond aux états `01` et `10` lors de l'exécution avec un hardware quantique).
 
-Resultats dans un simulateur (ex03)  |  Resultats avec un ordinateur quantique (ex04)
-:-------------------------:|:-------------------------:
-![](data/img/entanglement.png)  |  ![](data/img/quantum_noise.png)
+Résultats dans un simulateur (ex03) | Résultats avec un ordinateur quantique (ex04)
+:-------------:|:-------------:
+![entanglement](data/img/entanglement.png) | ![quantum noise](data/img/quantum_noise.png)
 
 > “The main source of failure in a quantum computer is noise, which comes from rogue forms of energy creeping into the quantum computer making the qubits drift away from where they should be and causing errors.” https://www.youtube.com/watch?v=-UlxHPIEVqA&t=1400s
 
@@ -171,6 +171,29 @@ Quand la fonction $f$ est balanced, l’état quantique après la query à l’o
 
 Si on run l’algo sur un vrai ordinateur et non un simulateur, on va se retrouver avec du bruit. On ne pourra pas obtenir le type d’oracle avec certitude, contrairement à l’exécution sur simulateur.
 
+Quand on lance le programme avec un simulateur, peu importe le nombre de `shots`, on va toujours avoir les mêmes résultats, `000` pour une fonction *constant* et `111` pour une *balanced*.
+
+Avec un hardware, le bruit sa provoquer des états où pour certains résultats on va avoir des mélanges: `010`, `101` …
+
+## Résultats
+
+### Constant
+
+Les qubits sont à `0` lorsque l'oracle est **constant**.
+
+Résultats avec un simulateur | Résultats avec un ordinateur quantique
+:-------------:|:-------------:
+![Deutsch-Jozsa oracle constant résultats (simulateur)](data/img/deutsch_jozsa_constant_result_sim.png) | ![Deutsch-Jozsa oracle constant résultats (hardware)](data/img/deutsch_jozsa_constant_result.png)
+
+### Balanced
+
+Les qubits sont à `1` lorsque l'oracle est **balanced**.
+
+Résultats avec un simulateur | Résultats avec un ordinateur quantique
+:-------------:|:-------------:
+![Deutsch-Jozsa oracle balanced résultats (simulateur)](data/img/deutsch_jozsa_balanced_result_sim.png) | ![Deutsch-Jozsa oracle balanced résultats (hardware)](data/img/deutsch_jozsa_balanced_result.png)
+
+
 <details>
   <summary>Sources</summary>
 
@@ -207,7 +230,7 @@ De ce que je comprends de ce qui est demandé, cet exercice peut être une impl�
 </details>
 
 
-# Ressources globales
+# Documentation
 
 ## Mentionnées par le sujet
 

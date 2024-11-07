@@ -11,38 +11,40 @@ RESET = '\033[0m'
 SHOTS = 500
 
 
-def process_result(counts, sim):
-    """ Process the result from the simulation, print the results/values
+def process_result(counts, sim_type):
+    """ Process the result from the simulation, print and plot the results
 
     Params
     -----
         counts (dict): holds the result of the simulation for the case '0' and '1'
-        sim (str): type of simulator used
+        sim_type (str): type of simulator used
 
     * Print the occurences for both states for the total shots
+    * Plot an histogram for the counts result of the simulation
     * Divide the occurence of the states by the number of shots
     *   and print the result as a total of 1
-
-    Return
-    -----
-        final_counts (dict): the result of each state as percentage of 1, to be used in the histogram
+    * Plot an histogram for the percentage result of the simulation
     """
 
     print(f"\n{ORANGE}============================={RESET}")
 
-    print(f"{BLUE}Measurements results ({sim} simulator):{RESET}")
+    print(f"{BLUE}Measurements results ({sim_type} simulator):{RESET}")
     print(f"\tfor the 0 state: {PURPLE}{counts['0']}{RESET}")
     print(f"\tfor the 1 state: {PURPLE}{counts['1']}{RESET}\n")
+
+    title = f"Counts measurement result obtained for the plus state $|+\\rangle$ with {SHOTS} shots on AerSimulator with method {sim_type}"
+    plot_histogram(counts, title=title, filename="histogram_plus_state_counts", figsize=(12, 8))
 
     final_counts = {
         '0': counts['0'] / SHOTS,
         '1': counts['1'] / SHOTS
     }
-    print(f"{BLUE}Measurements results as percentage of 1 ({sim} simulator):{RESET}")
+    print(f"{BLUE}Measurements results as percentage of 1 ({sim_type} simulator):{RESET}")
     print(f"\tfor the 0 state: {GREEN}{final_counts['0']}{RESET}")
     print(f"\tfor the 1 state: {GREEN}{final_counts['1']}{RESET}\n")
 
-    return final_counts
+    title = f"Percentage measurement result obtained for the plus state $|+\\rangle$ with {SHOTS} shots on AerSimulator with method {sim_type}"
+    plot_histogram(final_counts, title=title, filename="histogram_plus_state_percentage", figsize=(12, 8))
 
 
 def superposition():
@@ -57,8 +59,7 @@ def superposition():
     * Transpile (i.e. adapt) the circuit for the simulator obtained
     * Run the circuit on the simulator with a precise number of shots
     * Get the type of simulator that was used since the method was 'automatic'
-    * Process the result
-    * Plot the result in a histogram that will be saved in a .png file
+    * Process (print and plot) the result
     """
 
     qc = QuantumCircuit(1, 1)
@@ -80,10 +81,8 @@ def superposition():
     sim_type = result.results[0].metadata['method']
 
     counts = result.get_counts()
-    final_counts = process_result(counts, sim_type)
 
-    title = f"Measurement result of the plus state $|+\\rangle$ with {SHOTS} shots ({sim_type})"
-    plot_histogram(final_counts, title=title, filename="histogram_plus_state", figsize=(10, 6))
+    process_result(counts, sim_type)
 
 
 if __name__ == "__main__":
