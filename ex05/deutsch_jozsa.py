@@ -137,7 +137,7 @@ def sim_run_oracle(oracle_function):
         oracle_function (QuantumCircuit): the circuit of the oracle function
 
     * Get an AerSimulator, the method used is automatically selected based on the circuit and noise model
-    * Run the composed circuit on a AerSimulator with 1 shot
+    * Run the composed circuit on a AerSimulator SHOTS times
         * with the memory parameter to true in order to have the outcome of the shot as a list
     * Get the type of AerSimulator that was used
     * Get the outcome of the shots
