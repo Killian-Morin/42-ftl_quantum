@@ -2,12 +2,12 @@ import os
 from dotenv import load_dotenv
 
 from qiskit_ibm_runtime import QiskitRuntimeService
-from qiskit.visualization import plot_histogram
+from qiskit.visualization import plot_histogram, plot_distribution
 
 
 RED = '\033[31m'
 GREEN = '\033[32m'
-ORANGE = '\033[33m'
+YELLOW = '\033[33m'
 BLUE = '\033[34m'
 PURPLE = '\033[35m'
 RESET = '\033[0m'
@@ -44,11 +44,11 @@ def query_job():
         service = QiskitRuntimeService(channel='ibm_quantum', instance="ibm-q/open/main")
 
     # * Get all jobs of this account and prints them
-    all_jobs = service.jobs()
-    print(f"All jobs runned on this account:")
+    all_jobs = service.jobs(limit=None)
+    print("All jobs runned on this account:")
     for job in all_jobs:
         job_date = job.creation_date.strftime("%d %b %Y, %I:%M%p %Z")
-        print(f"job runned on {ORANGE}{job.backend().name}{RESET}, id: {ORANGE}{job.job_id()}{RESET}, created at: {job_date}")
+        print(f"job runned on {YELLOW}{job.backend().name}{RESET}, id: {YELLOW}{job.job_id()}{RESET}, created at: {job_date}")
 
     # * Gives the choice of which job to get more data
     job_id = input(f"\n{BLUE}Prompt to get info for: {RESET}")
@@ -108,7 +108,7 @@ def query_job():
 
     # * Plot the percentage result in a histogram
     title = rf"Percentage result of {job_id} with {shots} shots runned on {bck_name}"
-    plot_histogram(result_percentage, title=title, filename=f"histogram_percentage_{job_id}_{bck_name}", figsize=(12, 8))
+    plot_distribution(result_counts, title=title, filename=f"histogram_percentage_{job_id}_{bck_name}", figsize=(12, 8))
 
 
 if __name__ == "__main__":

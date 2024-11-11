@@ -1,11 +1,11 @@
 from qiskit import QuantumCircuit, transpile
 from qiskit_aer import AerSimulator
-from qiskit.visualization import plot_histogram, plot_state_city
+from qiskit.visualization import plot_histogram, plot_distribution
 from qiskit.quantum_info import DensityMatrix, Statevector
 
 
 GREEN = '\033[32m'
-ORANGE = '\033[33m'
+YELLOW = '\033[33m'
 BLUE = '\033[34m'
 PURPLE = '\033[35m'
 RESET = '\033[0m'
@@ -20,32 +20,22 @@ def process_result(counts, sim_type):
         counts (dict): holds the result of the simulation for the case '0' and '1'
         sim_type (str): type of simulator used
 
-    * Print the occurences for both states for the total shots
+    * Print the occurences and percentages for both states for the total shots
     * Plot an histogram for the counts result of the simulation
-    * Divide the occurence of the states by the number of shots
-    *   and print the result as a total of 1
-    * Plot an histogram for the percentage result of the simulation
+    * Plot a distribution for the percentage result of the simulation
     """
 
-    print(f"\n{ORANGE}============================={RESET}")
+    print(f"\n{YELLOW}============================={RESET}")
 
     print(f"{BLUE}Measurements results ({sim_type} simulator):{RESET}")
-    print(f"\tfor the 00 state: {PURPLE}{counts['0']}{RESET}")
-    print(f"\tfor the 11 state: {PURPLE}{counts['1']}{RESET}\n")
+    print(f"\tfor the 00 state: {PURPLE}{counts['0']}{RESET} ({GREEN}{counts['0'] / SHOTS}{RESET})")
+    print(f"\tfor the 11 state: {PURPLE}{counts['1']}{RESET} ({GREEN}{counts['1'] / SHOTS}{RESET})")
 
     title = f"Counts measurement result obtained for the $\Phi^+$ Bell state with {SHOTS} shots on AerSimulator with method {sim_type}"
-    plot_histogram(counts, title=title, filename="histogram_Phi_plus_counts", figsize=(12, 8))
+    plot_histogram(counts, title=title, filename="histogram_Phi_plus", figsize=(12, 8))
 
-    final_counts = {
-        '00': counts['0'] / SHOTS,
-        '11': counts['1'] / SHOTS
-    }
-    print(f"{BLUE}Measurements results as percentage of 1 ({sim_type} simulator):{RESET}")
-    print(f"\tfor the 00 state: {GREEN}{final_counts['00']}{RESET}")
-    print(f"\tfor the 11 state: {GREEN}{final_counts['11']}{RESET}\n")
-
-    title = rf"Percentage measurement result obtained for the $\Phi^+$ Bell state with {SHOTS} shots on AerSimulator with method {sim_type}"
-    plot_histogram(final_counts, title=title, filename="histogram_Phi_plus_percentage", figsize=(12, 8))
+    title = f"Percentage measurement result obtained for the $\Phi^+$ Bell state with {SHOTS} shots on AerSimulator with method {sim_type}"
+    plot_distribution(counts, title=title, filename="distribution_Phi_plus", figsize=(12, 8))
 
 
 def entanglement():

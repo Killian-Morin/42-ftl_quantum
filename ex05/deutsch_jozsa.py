@@ -1,6 +1,5 @@
 import os
 import sys
-import numpy as np
 from dotenv import load_dotenv
 
 from qiskit import QuantumCircuit
@@ -16,7 +15,7 @@ SHOTS = 500
 RESET = '\033[0m'
 GREEN = '\033[32m'
 RED = '\033[31m'
-ORANGE = '\033[33m'
+YELLOW = '\033[33m'
 BLUE = '\033[34m'
 PURPLE = '\033[35m'
 PINK = '\033[95m'
@@ -75,6 +74,10 @@ def balanced_oracle_subject():
     print(f"{GREEN}Created the balanced oracle function from the subject{RESET}")
 
     return qc
+
+
+def oracle_eval():
+    """ Placeholder to put the oracle given during the correction """
 
 
 def compile_circuit(oracle_function):
@@ -158,14 +161,14 @@ def sim_run_oracle(oracle_function):
     measurements = result.get_memory()
     counts = result.get_counts()
 
-    print(f"The measurements for the q_0, q_1 and q_2 are: {ORANGE}{measurements}{RESET}\n")
+    print(f"The measurements for the q_0, q_1 and q_2 are: {YELLOW}{measurements}{RESET}\n")
 
     if "1" in measurements[0]:
-        print(f"{RED}RESULT - SIMULATOR{RESET}: The function is {ORANGE}balanced{RESET}, some qubits at 1 !\n")
+        print(f"{RED}RESULT - SIMULATOR{RESET}: The function is {YELLOW}balanced{RESET}, some qubits at 1 !\n")
     else:
-        print(f"{RED}RESULT - SIMULATOR{RESET}: The function is {ORANGE}constant{RESET}, all qubits at 0 !\n")
+        print(f"{RED}RESULT - SIMULATOR{RESET}: The function is {YELLOW}constant{RESET}, all qubits at 0 !\n")
 
-    title=f"Counts measurement result for the simulation of type {sim_type}"
+    title = f"Counts measurement result for the simulation of type {sim_type}"
     plot_histogram(counts, title=title, filename="histogram_sim_counts", figsize=(12, 8))
 
 
@@ -220,7 +223,6 @@ def real_run_oracle(oracle_function):
         * The way I instantiate the QuantumCircuit, the ClassicalRegister get the name 'c'
         * we use this name to get their content
     * Plot the result in a histogram, saved as 'histogram_real_result_{job_id}'
-
     """
 
     print("\nThis will run the circuit on a real quantum computer ...")
@@ -283,7 +285,7 @@ def main():
         oracle_function = balanced_oracle_subject()
     # ? FOR THE ORACLE FUNCTION GIVEN IN THE CORRECTION
     elif choice == "eval":
-        # oracle_function = FUNCTION CALL
+        # oracle_function = oracle_eval()
         # print("\nThe oracle function of the correction (view it in correction_oracle_function.png)")
         # oracle_function.draw(output="mpl", filename="correction_oracle_function")
         return

@@ -64,9 +64,9 @@ Le but de cet exercice est de découvrir ce qu'est le **Quantum noise**. C'est d
 
 Cela provoque des resultats auxquels on ne s'attend pas parmi les états quantiques possibles (dans l'histogramme pour l'ordinateur quantique, cela correspond aux états `01` et `10` lors de l'exécution avec un hardware quantique).
 
-Résultats dans un simulateur (ex03) | Résultats avec un ordinateur quantique (ex04)
-:-------------:|:-------------:
-![entanglement](data/img/entanglement.png) | ![quantum noise](data/img/quantum_noise.png)
+| Résultats dans un simulateur (ex03) | Résultats avec un ordinateur quantique (ex04) |
+| :-------------: | :-------------: |
+| ![entanglement](data/img/entanglement.png) | ![quantum noise](data/img/quantum_noise.png) |
 
 > “The main source of failure in a quantum computer is noise, which comes from rogue forms of energy creeping into the quantum computer making the qubits drift away from where they should be and causing errors.” https://www.youtube.com/watch?v=-UlxHPIEVqA&t=1400s
 
@@ -181,17 +181,17 @@ Avec un hardware, le bruit sa provoquer des états où pour certains résultats 
 
 Les qubits sont à `0` lorsque l'oracle est **constant**.
 
-Résultats avec un simulateur | Résultats avec un ordinateur quantique
-:-------------:|:-------------:
-![Deutsch-Jozsa oracle constant résultats (simulateur)](data/img/deutsch_jozsa_constant_result_sim.png) | ![Deutsch-Jozsa oracle constant résultats (hardware)](data/img/deutsch_jozsa_constant_result.png)
+| Résultats avec un simulateur | Résultats avec un ordinateur quantique |
+| :-------------: | :-------------: |
+| ![Deutsch-Jozsa oracle constant résultats (simulateur)](data/img/deutsch_jozsa_constant_result_sim.png) | ![Deutsch-Jozsa oracle constant résultats (hardware)](data/img/deutsch_jozsa_constant_result.png) |
 
 ### Balanced
 
 Les qubits sont à `1` lorsque l'oracle est **balanced**.
 
-Résultats avec un simulateur | Résultats avec un ordinateur quantique
-:-------------:|:-------------:
-![Deutsch-Jozsa oracle balanced résultats (simulateur)](data/img/deutsch_jozsa_balanced_result_sim.png) | ![Deutsch-Jozsa oracle balanced résultats (hardware)](data/img/deutsch_jozsa_balanced_result.png)
+| Résultats avec un simulateur | Résultats avec un ordinateur quantique |
+| :-------------: | :-------------: |
+| ![Deutsch-Jozsa oracle balanced résultats (simulateur)](data/img/deutsch_jozsa_balanced_result_sim.png) | ![Deutsch-Jozsa oracle balanced résultats (hardware)](data/img/deutsch_jozsa_balanced_result.png) |
 
 
 <details>
@@ -211,24 +211,181 @@ Résultats avec un simulateur | Résultats avec un ordinateur quantique
 
 ## Exercice 6: Algorithme de recherche
 
-De ce que je comprends de ce qui est demandé, cet exercice peut être une implémentation de l’algorithme de Grover.
+De ce que je comprends de ce qui est demandé, cet exercice est une implémentation de l’algorithme de Grover.
+
+> Votre algorithme doit permettre de rechercher un ou plusieurs éléments qui répondent à un critère donné parmi N éléments non classés.
+>
+> Vous devrez avoir 3 parties distinctes:
+> - L’initialisation des états.
+> - L’Oracle.
+> - Le Diffuser.
+>
+> Votre algorithme prendra un nombre Y de qubits (minimum 2) et ne devra demander aucune modification pour fonctionner.
+>
+> Comme pour l’algorithme de Deutsch-Jozsa, plusieurs Oracle seront fournis lors de l’évaluation pour vérifier le bon fonctionnement de votre algorithme.
+>
+
+L’algorithme de Grover permet de faire une recherche avec une complexité de $\mathcal{O}\sqrt{N}$.
+
+Big O notation avec la complexité $\mathcal{O}\sqrt{N}$ comprise: https://en.wikipedia.org/wiki/Time_complexity#/media/File:Comparison_computational_complexity.svg
+
+> le calcul peut être réalisé de manière à donner à l'état intéressant une probabilité proche de 1 et le reste une probabilité négligeable, et mesurer ainsi avec certitude le résultat recherché. C'est exactement ce qui va se passer pour l'algorithme de Grover où une phase « d'amplification » cherche à rendre déterministe le résultat recherché. https://fr.wikipedia.org/wiki/Algorithme_de_Grover
+>
+
+> In a nutshell, Grover's algorithm applies different powers of and after each execution checks whether a good solution has been found.
+https://github.com/Qiskit/qiskit-tutorials/blob/master/tutorials/algorithms/06_grover.ipynb
+>
+
+Une autre capacité utile de cet algo est que la structure interne de la liste à chercher n’est pas utilisée, ce qui fait que l’algo est *générique* donc applicable facilement dans des problèmes différents.
+
+### Step 1: Préparation des états
+
+On applique à tous les qubits du circuit une Hadamard Gate pour les placer dans un état de superposition égale.
+
+### Step 2: L’oracle
+
+> La boîte noire est définie mathématiquement par une fonction $fcritere(x)$ qui identifie si un état «$x$» vérifie un certain critère :
+$fcritere(x)={1,\;si\;x\;verifie\;le\;critere\brace 0\;sinon}$
+Cette boîte noire est bien entendu en mesure d'accepter une *superposition* d'états en entrée, et donc de vérifier le critère simultanément pour tous les états de la superposition. En effet, la boîte noire est elle-même implémentée par un calcul quantique, qui est en mesure d'opérer sur une superposition d'un bout à l'autre d'algorithme qui détermine le critère.
+> https://fr.wikipedia.org/wiki/Algorithme_de_Grover#Pr%C3%A9sentation_g%C3%A9n%C3%A9rale_de_l'algorithme
+
+L’oracle est accessible sous la forme d’un opérateur unitaire $U_\omega$ (avec $\omega$ la query a l’oracle qui renvoie $1$, i.e. le résultat à trouver) qui agit comme suit:
+
+$$
+U_\omega \ket{x} = {\;\;\;\ket{x} if\; x=\omega\brace -\ket{x}if\;x\ne\omega}
+$$
+
+Cet oracle est une matrice diagonale où l’entrée correspondant à l’état marqué aura une phase négative.
+
+Dans le cas d’un système avec 2 qubits et $\omega = 10$:
+
+$$
+U_\omega =
+\begin{bmatrix}
+1 & 0 & 0 & 0\\
+0 & 1 & 0 & 0\\
+0 & 0 & -1 & 0\\
+0 & 0 & 0 & 1
+\end{bmatrix}
+\begin{aligned}
+\\
+\leftarrow \omega = \text{10}
+\\
+\end{aligned}
+$$
+
+Avec 3 qubits et $\omega = 101$:
+
+$$
+U_\omega =
+\begin{bmatrix}
+1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & -1 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+\end{bmatrix}
+\begin{aligned}
+\\
+\\
+\\
+\\
+\leftarrow \omega = \text{101}
+\\
+\\
+\\
+\end{aligned}
+$$
+
+Le rôle de l’oracle est de marquer la réponse recherchée dans la liste. Comme mentionné plus haut avec la matrice, le marquage de la réponse se fait en la faisant négative.
+
+C’est ensuite utilisé par le diffuser qui va augmenter la probabilité pour cet état précis afin que lors de la mesure, cet état se distingue des autres.
+
+### Step 3: Le diffuser
+
+“L’opérateur de Grover” possède la forme $\text{\^{G}}
+ = (\text{\^{H}} \text{\^{Z}} \text{\^{H}}) \text{\^{O}}$ où
+
+$\text{\^{O}}$ est l’oracle, $\text{\^{H}}$ est l’opérateur/transformée d’Hadamard, $\text{\^{Z}}$ est l’opérateur `Zero phase shift` défini comme $\text{\^{Z}} = 2 \ket{0} \bra{0} - \text{\^{I}}$ ($\text{\^{I}}$ étant l’opérateur d’identité)
+
+$\text{\^{H}} \text{\^{Z}} \text{\^{H}}$ est l’**opérateur de diffusion de Grover**
+
+C’est cet opérateur qui va inverser les états autour de la moyenne, *le miroir des amplitudes autour de la moyenne des amplitudes*.
+Cela permet d'amplifier l'état cible et de diminuer les autres états.
+
+Cette étape peut être répéter $\frac{\pi}{4} \sqrt{N}$ fois pour attendre un resultat optimal. Avec un système avec 3 qubits, il peut y avoir 8 états possibles donc $\frac{\pi}{4}\sqrt{8} \approx 2$.
+
+> Enter the procedure called amplitude amplification, which is how a quantum computer significantly enhances this probability. This procedure stretches out (amplifies) the amplitude of the marked item, which shrinks the other items' amplitude, so that measuring the final state will return the right item with near-certainty.
+https://github.com/Qiskit/textbook/blob/main/notebooks/ch-algorithms/grover.ipynb
+>
+
+## Résultats
+
+En utilisant l'oracle donné comme exemple dans le sujet:
+<div style="text-align: center;">
+
+  ![un circuit d'oracle](data/img/grover_oracle_subject.png)
+
+</div>
+
+On obtient le circuit suivant après avoir initialisé les états des 3 qubits du systeme, combiné le circuit de l'oracle avec la phase d'amplification grâce au `GroverOperator` et enfin combiné les deux circuits (l'initialisation et l'oracle + amplification):
+
+<div style="text-align: center;">
+
+  ![un circuit final pour l'algorithme de Grover](data/img/grover_final_circuit_composed.png)
+
+  La partie au centre, une fois decomposée donne:
+  ![la partie oracle et amplification pour l'algorithme de Grover](data/img/grover_oracle_operator_decompose.png)
+
+</div>
+
+L'oracle du sujet marque l'état `111`, d'où les résultats suivants:
+
+| Résultats avec un simulateur | Résultats avec un ordinateur quantique |
+| :-------------: | :-------------: |
+| ![Algorithme de Grover histogramme (simulateur)](data/img/grover_sim_histogram.png) | ![Algorithme de Grover histogramme (hardware)](data/img/grover_real_histogram.png) |
+| ![Algorithme de Grover distribution (simulateur)](data/img/grover_sim_distribution.png) | ![Algorithme de Grover distribution (hardware)](data/img/grover_real_distribution.png) |
+
+Oracle marquant 2 états comme des solutions pour un circuit avec 3 Qubits:
+```python
+  oracle = QuantumCircuit(3)
+
+  oracle.x(2)
+
+  qc.compose(MCMT(ZGate(), 2, 1), inplace=True)
+
+  oracle.x([0, 1, 2])
+
+  oracle.compose(MCMT(ZGate(), 2, 1), inplace=True)
+
+  oracle.x([0, 1])
+
+  oracle.draw(output="mpl", filename="oracle_two_solution")
+```
+On peut facilement expérimenter, en se basant sur cet oracle pour observer la relation entre les états qui sont marqués comme des solutions et les gates permettant la création de circuit.
 
 <details>
   <summary>Sources</summary>
 
-  [L'informatique quantique c'est simple en fait | Youtube](https://www.youtube.com/watch?v=wfXs7QXy4IU)
+  [Algorithme de Grover | Wikipedia](https://fr.wikipedia.org/wiki/Algorithme_de_Grover)
 
-  [A Visual Introduction to Grover's Algorithm and Reflections | Gordon Ma Youtube](https://www.youtube.com/watch?v=c30KrWjHaw4)
+  [L'informatique quantique c'est simple en fait - V2F | Youtube](https://www.youtube.com/watch?v=wfXs7QXy4IU)
+
+  [A Visual Introduction to Grover's Algorithm and Reflections - Gordon Ma | Youtube](https://www.youtube.com/watch?v=c30KrWjHaw4)
 
   [Grover's Algorithm | Qiskit Textbook](https://github.com/Qiskit/textbook/blob/main/notebooks/ch-algorithms/grover.ipynb)
 
-  [Grover's Algorithm | Qiskit Tutorials](https://github.com/Qiskit/qiskit-tutorials/blob/master/tutorials/algorithms/06_grover.ipynb)
-
   [Grover's Algorithm | IBM Quantum Learning](https://learning.quantum.ibm.com/tutorial/grovers-algorithm)
 
-  [Algorithme de Grover | Wikipedia](https://fr.wikipedia.org/wiki/Algorithme_de_Grover)
-</details>
+  [GroverOperator | IBM Quantum Documentation](https://docs.quantum.ibm.com/api/qiskit/qiskit.circuit.library.GroverOperator)
 
+  [Grover's Algorithm | Qiskit Tutorials](https://github.com/Qiskit/qiskit-tutorials/blob/master/tutorials/algorithms/06_grover.ipynb) implémentation utilisant la classe `Grover` qui est deprecated donc pas très pertinent
+
+  [Grover's Quantum Search Algorithm, Geometric Visualization, Quantum Circuit Diagram - Elucydia | Youtube](https://www.youtube.com/watch?v=en9qMDo-CDY)
+</details>
 
 # Documentation
 
@@ -272,7 +429,7 @@ Vidéos interéssantes (There is more to explore here) sur le sujet de [David Lo
 
 [FLP Vol. III Table of Contents](https://www.feynmanlectures.caltech.edu/III_toc.html)
 
-[Photons Jumeaux | Youtube Channel](https://www.youtube.com/@photonsjumeaux4395/videos)
+[Photons Jumeaux | Chaîne Youtube](https://www.youtube.com/@photonsjumeaux4395/videos)
 
 [Qiskit | Slack](https://qiskit.enterprise.slack.com)
 

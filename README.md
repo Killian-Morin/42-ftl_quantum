@@ -64,9 +64,9 @@ The goal of this exercice is to discover what is **quantum noise**. This 'noise'
 
 Those intermediary states leads to unexpected results among the possible quantum states. In the histogram for quantum hardware, the noise corresponds to the states `01` and `10`.
 
-Results with a simulator (ex03)  |  Results with quantum hardware (ex04)
-:-------------:|:-------------:
-![entanglement](data/img/entanglement.png) | ![quantum noise](data/img/quantum_noise.png)
+| Results with a simulator (ex03)  |  Results with quantum hardware (ex04) |
+| :-------------: | :-------------: |
+| ![entanglement](data/img/entanglement.png) | ![quantum noise](data/img/quantum_noise.png) |
 
 > “The main source of failure in a quantum computer is noise, which comes from rogue forms of energy creeping into the quantum computer making the qubits drift away from where they should be and causing errors.” https://www.youtube.com/watch?v=-UlxHPIEVqA&t=1400s
 
@@ -180,17 +180,17 @@ If we execute the algorithm on a real computer and not a simulator we would have
 
 The qubits are at `0` when the Oracle is **constant**.
 
-Results with a simulator | Results with real quantum hardware
-:-------------:|:-------------:
-![Deutsch-Jozsa constant oracle result (simulateur)](data/img/deutsch_jozsa_constant_result_sim.png) | ![Deutsch-Jozsa constant oracle result (hardware)](data/img/deutsch_jozsa_constant_result.png)
+| Results with a simulator | Results with real quantum hardware |
+| :-------------: | :-------------: |
+| ![Deutsch-Jozsa constant oracle result (simulateur)](data/img/deutsch_jozsa_constant_result_sim.png) | ![Deutsch-Jozsa constant oracle result (hardware)](data/img/deutsch_jozsa_constant_result.png) |
 
 ### Balanced
 
 The qubits are at `1` when the Oracle is **balanced**.
 
-Results with a simulator | Results with real quantum hardware
-:-------------:|:-------------:
-![Deutsch-Jozsa balanced oracle result (simulateur)](data/img/deutsch_jozsa_balanced_result_sim.png) | ![Deutsch-Jozsa balanced oracle result (hardware)](data/img/deutsch_jozsa_balanced_result.png)
+| Results with a simulator | Results with real quantum hardware |
+| :-------------: | :-------------: |
+| ![Deutsch-Jozsa balanced oracle result (simulateur)](data/img/deutsch_jozsa_balanced_result_sim.png) | ![Deutsch-Jozsa balanced oracle result (hardware)](data/img/deutsch_jozsa_balanced_result.png) |
 
 
 <details>
@@ -212,20 +212,166 @@ Results with a simulator | Results with real quantum hardware
 
 From what I can tell, this exercice is an implementation of the Grover's algorithm.
 
+> Your algorithm should search for one or more items that meet a given requirement among N unclassified items.
+>
+> You will need to have 3 distinct parts:
+> - The initialization of states.
+> - The Oracle.
+> - Diffuser.
+>
+> Your algorithm will take a Y number of qubits (minimum 2) and must not require any modification to work.
+>
+> Similar to the Deutsch-Jozsa algorithm, several Oracle’s will be provided during the evaluation to verify that your algorithm is working properly.
+
+Grover's Algorithm is able to do a search in a system with a time complexity of $\mathcal{O}\sqrt{N}$.
+
+A Big O notation with the $\mathcal{O}\sqrt{N}$ complexity: https://en.wikipedia.org/wiki/Time_complexity#/media/File:Comparison_computational_complexity.svg
+
+> In a nutshell, Grover's algorithm applies different powers of and after each execution checks whether a good solution has been found.
+https://github.com/Qiskit/qiskit-tutorials/blob/master/tutorials/algorithms/06_grover.ipynb
+>
+
+Since the algorithm does not rely on the internal structure of the list that is passed as input, it can be easily applied to differents problems.
+
+### Step 1: Initialization of states
+
+We apply an Hadamard gate on all qubits of the circuit to put them in equal superposition states.
+
+### Step 2: The Oracle
+
+The oracle can be summarize with a unitary operator $U_\omega$ (with $\omega$ the query to the oracle that returns $1$, i.e. the result to find):
+
+$$
+U_\omega \ket{x} = {\;\;\;\ket{x} if\; x=\omega\brace -\ket{x}if\;x\ne\omega}
+$$
+
+This oracle will be a diagonal matrix, where the entry that correspond to the marked item will have a negative phase.
+
+With 2 qubits and $\omega = 10$:
+
+$$
+U_\omega =
+\begin{bmatrix}
+1 & 0 & 0 & 0\\
+0 & 1 & 0 & 0\\
+0 & 0 & -1 & 0\\
+0 & 0 & 0 & 1
+\end{bmatrix}
+\begin{aligned}
+\\
+\leftarrow \omega = \text{10}
+\\
+\end{aligned}
+$$
+
+With 3 qubits and $\omega = 101$:
+
+$$
+U_\omega =
+\begin{bmatrix}
+1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & -1 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+\end{bmatrix}
+\begin{aligned}
+\\
+\\
+\\
+\\
+\leftarrow \omega = \text{101}
+\\
+\\
+\\
+\end{aligned}
+$$
+
+The job of the oracle is to mark the answer in the list. Like in the above matrix, the answer is highlighted by making it negative.
+
+This is then used by the diffuser to augment the probabilities of this state so that when measuring the states it will be distinguable from the others states.
+
+### Step 3: The Diffuser
+
+The Grover Operator has the following form: $\text{\^{G}} = (\text{\^{H}} \text{\^{Z}} \text{\^{H}}) \text{\^{O}}$ where $\text{\^{O}}$ is the oracle, $\text{\^{H}}$ is the Hadamard transform, $\text{\^{Z}}$ is the operator `Zero phase shift` defined as $\text{\^{Z}} = 2 \ket{0} \bra{0} - \text{\^{I}}$ ($\text{\^{I}}$ as the Identity Operator)
+
+$\text{\^{H}} \text{\^{Z}} \text{\^{H}}$ is the **Grover's diffusion operator**.
+
+This is the operator that will reverse the states around the average, this is the *the amplitude mirror around the average amplitude*.
+This will amplify the answer state and diminish the other states.
+
+This step can be repeated $\frac{\pi}{4} \sqrt{N}$ times in order to have the best results. With a 3 qubits system, there can be 8 possible states, so $\frac{\pi}{4}\sqrt{8} \approx 2$.
+
+> Enter the procedure called amplitude amplification, which is how a quantum computer significantly enhances this probability. This procedure stretches out (amplifies) the amplitude of the marked item, which shrinks the other items' amplitude, so that measuring the final state will return the right item with near-certainty.
+https://github.com/Qiskit/textbook/blob/main/notebooks/ch-algorithms/grover.ipynb
+>
+
+## Results
+
+Using the oracle given as example in the subject:
+<div style="text-align: center;">
+
+  ![oracle circuit](data/img/grover_oracle_subject.png)
+
+</div>
+
+We get the following circuit after initializing the 3 qubits of the system, combined the circuit of the oracle with the amplification phase using `GroverOperator` and finally composed both circuits (the initialization and the oracle/amplification):
+
+<div style="text-align: center;">
+
+  ![finalized circuit for Grover's Algorithm](data/img/grover_final_circuit_composed.png)
+
+  The center part, once decomposed:
+  ![the oracle and amplification part for a Grover's Algorithm](data/img/grover_oracle_operator_decompose.png)
+
+</div>
+
+The oracle from the subject put a stamp on the state `111`, some results we can obtain:
+
+| Results with a simulator | Results with quantum hardware |
+| :-------------: | :-------------: |
+| ![Grover's algorithm histogram (simulator)](data/img/grover_sim_histogram.png) | ![Grover's algorithm histogram (hardware)](data/img/grover_real_histogram.png) |
+| ![Grover's algorithm distribution (simulator)](data/img/grover_sim_distribution.png) | ![Grover's algorithm distribution (hardware)](data/img/grover_real_distribution.png) |
+
+An Oracle tagging two states as answers for a circuit with 3 Qubits:
+```python
+  oracle = QuantumCircuit(3)
+
+  oracle.x(2)
+
+  qc.compose(MCMT(ZGate(), 2, 1), inplace=True)
+
+  oracle.x([0, 1, 2])
+
+  oracle.compose(MCMT(ZGate(), 2, 1), inplace=True)
+
+  oracle.x([0, 1])
+
+  oracle.draw(output="mpl", filename="oracle_two_solution")
+```
+Using this circuit, we can easily adjust some gates, the `compose` part to see the relation between those and the states created.
+
 <details>
   <summary>Sources</summary>
 
-  [L'informatique quantique c'est simple en fait - V2F Youtube](https://www.youtube.com/watch?v=wfXs7QXy4IU)
+  [Grover's Algorithm | Wikipedia](https://en.wikipedia.org/wiki/Grover%27s_algorithm)
 
-  [A Visual Introduction to Grover's Algorithm and Reflections - Gordon Ma Youtube](https://www.youtube.com/watch?v=c30KrWjHaw4)
+  [L'informatique quantique c'est simple en fait - V2F (French) | Youtube](https://www.youtube.com/watch?v=wfXs7QXy4IU)
 
-  [Grover's Algorithm - Qiskit Textbook](https://github.com/Qiskit/textbook/blob/main/notebooks/ch-algorithms/grover.ipynb)
+  [A Visual Introduction to Grover's Algorithm and Reflections - Gordon Ma | Youtube](https://www.youtube.com/watch?v=c30KrWjHaw4)
 
-  [Grover's Algorithm - Qiskit Tutorials](https://github.com/Qiskit/qiskit-tutorials/blob/master/tutorials/algorithms/06_grover.ipynb)
+  [Grover's Algorithm | Qiskit Textbook](https://github.com/Qiskit/textbook/blob/main/notebooks/ch-algorithms/grover.ipynb)
 
-  [Grover's Algorithm - IBM Quantum Learning](https://learning.quantum.ibm.com/tutorial/grovers-algorithm)
+  [Grover's Algorithm | IBM Quantum Learning](https://learning.quantum.ibm.com/tutorial/grovers-algorithm)
 
-  [Algorithme de Grover - Wikipedia](https://fr.wikipedia.org/wiki/Algorithme_de_Grover)
+  [GroverOperator | IBM Quantum Documentation](https://docs.quantum.ibm.com/api/qiskit/qiskit.circuit.library.GroverOperator)
+
+  [Grover's Algorithm - Qiskit Tutorials](https://github.com/Qiskit/qiskit-tutorials/blob/master/tutorials/algorithms/06_grover.ipynb) -> use of `Grover` deprecated class, so not really useful
+
+  [Grover's Quantum Search Algorithm, Geometric Visualization, Quantum Circuit Diagram - Elucydia | Youtube](https://www.youtube.com/watch?v=en9qMDo-CDY)
 </details>
 
 # Documentation

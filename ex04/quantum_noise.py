@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 
 from qiskit import QuantumCircuit
-from qiskit.visualization import plot_histogram
+from qiskit.visualization import plot_histogram, plot_distribution
 from qiskit.quantum_info import Statevector
 from qiskit_ibm_runtime import QiskitRuntimeService, SamplerV2 as Sampler
 from qiskit.transpiler.preset_passmanagers import generate_preset_pass_manager
@@ -59,7 +59,6 @@ def create_circuit():
     title = "Ideal distribution of this circuit"
     plot_histogram(ideal_distribution, title=title, filename="ideal_dist_Phi_plus", figsize=(12, 8))
 
-    # qc.measure([0, 1], [0, 1])
     qc.measure_all()
 
     print("\nASCII representation of the circuit:")
@@ -151,11 +150,9 @@ def process_result(job, bck, qc):
             * and returns the value of the attribute
         * this allow to not hardcode the name of the ClassicalRegister, by default 'meas'
         * in the PubResult, get the data attribute, inside it there are the classical bits
-    * Print the occurences of each states for the total shots with the name of the backend and the job_id
+    * Print the occurences and percentages of each states for the total amount of shots
     * Plot an histogram for the counts results of the job
-    * Divide the occurence of the states by the number of shots
-    * Print the results as percentage of 1
-    * Plot an histogram for the percentage results of the job
+    * Plot a distribution for the percentage results of the job
     """
 
     result = job.result()[0]
@@ -167,29 +164,16 @@ def process_result(job, bck, qc):
     pub_result = getattr(result.data, classical_bits_name).get_counts()
 
     print(f"{BLUE}Measurement results info on a total of {SHOTS} shots (runned on {bck.name}, id = {job_id}):{RESET}")
-    print(f"\tfor the 00 state: {PURPLE}{pub_result['00']}{RESET}")
-    print(f"\tfor the 01 state: {PURPLE}{pub_result['01']}{RESET}")
-    print(f"\tfor the 10 state: {PURPLE}{pub_result['10']}{RESET}")
-    print(f"\tfor the 11 state: {PURPLE}{pub_result['11']}{RESET}")
+    print(f"\tfor the 00 state: {PURPLE}{pub_result['00']}{RESET} ({GREEN}{pub_result['00'] / SHOTS}{RESET})")
+    print(f"\tfor the 01 state: {PURPLE}{pub_result['01']}{RESET} ({GREEN}{pub_result['01'] / SHOTS}{RESET})")
+    print(f"\tfor the 10 state: {PURPLE}{pub_result['10']}{RESET} ({GREEN}{pub_result['10'] / SHOTS}{RESET})")
+    print(f"\tfor the 11 state: {PURPLE}{pub_result['11']}{RESET} ({GREEN}{pub_result['11'] / SHOTS}{RESET})")
 
     title = rf"Counts measurement result obtained for the $\Phi^+$ Bell state with {SHOTS} shots runned on {bck.name}"
-    plot_histogram(pub_result, title=title, filename=f"histogram_Phi_plus_counts_{job_id}", figsize=(12, 8))
-
-    result_percentage = {
-        '00': pub_result['00'] / SHOTS,
-        '01': pub_result['01'] / SHOTS,
-        '10': pub_result['10'] / SHOTS,
-        '11': pub_result['11'] / SHOTS
-    }
-
-    print(f"{BLUE}Measurement results as percentage of 1 (runned on {bck.name}, id = {job_id}):{RESET}")
-    print(f"\tfor the 00 state: {GREEN}{result_percentage['00']}{RESET}")
-    print(f"\tfor the 01 state: {GREEN}{result_percentage['01']}{RESET}")
-    print(f"\tfor the 10 state: {GREEN}{result_percentage['10']}{RESET}")
-    print(f"\tfor the 11 state: {GREEN}{result_percentage['11']}{RESET}")
+    plot_histogram(pub_result, title=title, filename=f"histogram_Phi_plus_{job_id}", figsize=(12, 8))
 
     title = rf"Percentage measurement result obtained for the $\Phi^+$ Bell state with {SHOTS} shots runned on {bck.name}"
-    plot_histogram(result_percentage, title=title, filename=f"histogram_Phi_plus_percentage_{job_id}", figsize=(12, 8))
+    plot_distribution(pub_result, title=title, filename=f"distribution_Phi_plus_{job_id}", figsize=(12, 8))
 
 
 def entanglement_real():
