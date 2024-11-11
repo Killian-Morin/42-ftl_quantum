@@ -144,24 +144,15 @@ The algorithm steps to match the subject with 4 qubits:
 
 2. Create a superposition state of each input qubits of the first register by applying an Hadamard gate on each qubit.
     - the resulting state:
-
-        $$
-        H^{\otimes3}\ket{000}\ket{0}=\frac{1}{\sqrt{2^3}}\sum_{\substack{i=0}}^{2^3-1}{\ket{i}\ket{0}}
-        $$
+        $$H^{\otimes3}\ket{000}\ket{0}=\frac{1}{\sqrt{2^3}}\sum_{\substack{i=0}}^{2^3-1}{\ket{i}\ket{0}}$$
 
 3. Return the second resigter and apply an Hadamard gate. This is to store the response of the oracle .
     - the resulting state:
-
-        $$
-        \frac{1}{\sqrt{2^3}}\sum_{\substack{i=0}}^{2^3-1}{\ket{i}\ket{0}} \rightarrow \frac{1}{\sqrt{2^{3+1}}}\sum_{\substack{i=0}}^{2^3-1}\ket{i}(\ket{0}-\ket{1})
-        $$
+        $$\frac{1}{\sqrt{2^3}}\sum_{\substack{i=0}}^{2^3-1}{\ket{i}\ket{0}} \rightarrow \frac{1}{\sqrt{2^{3+1}}}\sum_{\substack{i=0}}^{2^3-1}\ket{i}(\ket{0}-\ket{1})$$
 
 4. Query the oracle
     - the corresponding state:
-
-        $$
-        \frac{1}{\sqrt{2^{3+1}}}\sum_{\substack{i=0}}^{2^3-1}\ket{i}(\ket{0}-\ket{1}) \rightarrow \frac{1}{\sqrt{2^{3+1}}}\sum_{\substack{i=0}}^{2^3-1}(-1)^{f(i)}\ket{i}(\ket{0}-\ket{1})
-        $$
+        $$\frac{1}{\sqrt{2^{3+1}}}\sum_{\substack{i=0}}^{2^3-1}\ket{i}(\ket{0}-\ket{1}) \rightarrow \frac{1}{\sqrt{2^{3+1}}}\sum_{\substack{i=0}}^{2^3-1}(-1)^{f(i)}\ket{i}(\ket{0}-\ket{1})$$
 
 5. Apply an Hadamard gate on the first register
 6. Measure the second register, if it's not 0 the function is balanced, else it's constant.
@@ -296,9 +287,9 @@ This is then used by the diffuser to augment the probabilities of this state so 
 
 ### Step 3: The Diffuser
 
-The Grover Operator has the following form: $\text{\^{G}} = (\text{\^{H}} \text{\^{Z}} \text{\^{H}}) \text{\^{O}}$ where $\text{\^{O}}$ is the oracle, $\text{\^{H}}$ is the Hadamard transform, $\text{\^{Z}}$ is the operator `Zero phase shift` defined as $\text{\^{Z}} = 2 \ket{0} \bra{0} - \text{\^{I}}$ ($\text{\^{I}}$ as the Identity Operator)
+The Grover Operator has the following form: $\hat{G} = (\hat{H} \hat{Z} \hat{H}) \hat{O}$ where $\hat{O}$ is the oracle, $\hat{H}$ is the Hadamard transform, $\hat{Z}$ is the operator `Zero phase shift` defined as $\hat{Z} = 2 \ket{0} \bra{0} - \hat{I}$ ($\hat{I}$ as the Identity Operator)
 
-$\text{\^{H}} \text{\^{Z}} \text{\^{H}}$ is the **Grover's diffusion operator**.
+$\hat{H} \hat{Z} \hat{H}$ is the **Grover's diffusion operator**.
 
 This is the operator that will reverse the states around the average, this is the *the amplitude mirror around the average amplitude*.
 This will amplify the answer state and diminish the other states.
