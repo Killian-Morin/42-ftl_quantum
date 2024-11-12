@@ -20,7 +20,8 @@ Le sujet pour cet exercice à la consigne suivante:
     > - Lister tous les simulateurs quantiques disponibles avec leur queue actuelle.
     > - Lister tous les ordinateurs quantiques disponibles avec leur queue actuelle ainsi que le nombre de qubits qu’ils disposent.
 
-La fonction `IBMQ.get_provider()` et l’objet `IBMQ` mentionnés sont, depuis la version 0.40.0 du package `qiskit-ibmq-provider` et 0.20.0 de Qiskit obsolète, et ont été supprimés avec la 1.0.0.
+> [!WARNING]
+> La fonction `IBMQ.get_provider()` et l’objet `IBMQ` mentionnés sont, depuis la version 0.40.0 du package `qiskit-ibmq-provider` et 0.20.0 de Qiskit obsolète, et ont été supprimés avec la 1.0.0.
 
 J'ai essayé de faire l'exercice avec une ancienne version de Qiskit (0.22.0) mais obtient l'erreur `ImportError: cannot import name 'IBMQ' from partially initialized module 'qiskit'` en voulant importer `IBMQ` de `qiskit`, c.f. la branche dediée: https://github.com/Killian-Morin/ftl_quantum/tree/qiskit_pre_0.40.0
 
@@ -92,7 +93,7 @@ Dans `data` on a le circuit classique où les résultats des mesures ont été m
 <details>
   <summary>Sources</summary>
 
-  [How to sample a Bell State using Qiskit | Qiskit Youtube](https://www.youtube.com/watch?v=9MOIBcYf9wk)
+  [How to sample a Bell State using Qiskit - Qiskit | Youtube](https://www.youtube.com/watch?v=9MOIBcYf9wk)
 
   [What are ISA circuits? | IBM Quantum Blog](https://www.ibm.com/quantum/blog/isa-circuits)
 </details>
@@ -177,9 +178,9 @@ Quand on lance le programme avec un simulateur, peu importe le nombre de `shots`
 
 Avec un hardware, le bruit sa provoquer des états où pour certains résultats on va avoir des mélanges: `010`, `101` …
 
-## Résultats
+### Résultats
 
-### Constant
+#### Constant
 
 Les qubits sont à `0` lorsque l'oracle est **constant**.
 
@@ -187,7 +188,7 @@ Les qubits sont à `0` lorsque l'oracle est **constant**.
 | ------------- | ------------- |
 | ![Deutsch-Jozsa oracle constant résultats (simulateur)](data/img/deutsch_jozsa_constant_result_sim.png) | ![Deutsch-Jozsa oracle constant résultats (hardware)](data/img/deutsch_jozsa_constant_result.png) |
 
-### Balanced
+#### Balanced
 
 Les qubits sont à `1` lorsque l'oracle est **balanced**.
 
@@ -201,7 +202,7 @@ Les qubits sont à `1` lorsque l'oracle est **balanced**.
 
   [Algorithme de Deutsch-Jozsa | Wikipedia](https://fr.wikipedia.org/wiki/Algorithme_de_Deutsch-Jozsa)
 
-  [Deutsch-Jozsa Algorithm | Qiskit Tutorials](https://github.com/qiskit-community/qiskit-community-tutorials/blob/master/algorithms/deutsch_jozsa.ipynb)
+  [Deutsch-Jozsa Algorithm - Qiskit Community Tutorials | Github](https://github.com/qiskit-community/qiskit-community-tutorials/blob/master/algorithms/deutsch_jozsa.ipynb)
 
   [Quantum query algorithms, the Deutsch-Jozsa Algorithm | Qiskit Learning](https://learning.quantum.ibm.com/course/fundamentals-of-quantum-algorithms/quantum-query-algorithms#the-deutsch-jozsa-algorithm)
 
@@ -322,7 +323,7 @@ Cette étape peut être répéter $\frac{\pi}{4} \sqrt{N}$ fois pour attendre un
 https://github.com/Qiskit/textbook/blob/main/notebooks/ch-algorithms/grover.ipynb
 >
 
-## Résultats
+### Résultats
 
 En utilisant l'oracle donné comme exemple dans le sujet:
 <div style="text-align: center;">
@@ -376,20 +377,117 @@ On peut facilement expérimenter, en se basant sur cet oracle pour observer la r
 
   [A Visual Introduction to Grover's Algorithm and Reflections - Gordon Ma | Youtube](https://www.youtube.com/watch?v=c30KrWjHaw4)
 
-  [Grover's Algorithm | Qiskit Textbook](https://github.com/Qiskit/textbook/blob/main/notebooks/ch-algorithms/grover.ipynb)
+  [Grover's Algorithm - Qiskit Textbook | Github](https://github.com/Qiskit/textbook/blob/main/notebooks/ch-algorithms/grover.ipynb)
 
   [Grover's Algorithm | IBM Quantum Learning](https://learning.quantum.ibm.com/tutorial/grovers-algorithm)
 
   [GroverOperator | IBM Quantum Documentation](https://docs.quantum.ibm.com/api/qiskit/qiskit.circuit.library.GroverOperator)
 
-  [Grover's Algorithm | Qiskit Tutorials](https://github.com/Qiskit/qiskit-tutorials/blob/master/tutorials/algorithms/06_grover.ipynb) implémentation utilisant la classe `Grover` qui est deprecated donc pas très pertinent
+  [Grover's Algorithm | Qiskit Community Tutorials github](https://github.com/Qiskit/qiskit-tutorials/blob/master/tutorials/algorithms/06_grover.ipynb) implémentation utilisant la classe `Grover` qui est deprecated donc pas très pertinent
 
   [Grover's Quantum Search Algorithm, Geometric Visualization, Quantum Circuit Diagram - Elucydia | Youtube](https://www.youtube.com/watch?v=en9qMDo-CDY)
 </details>
 
-# Documentation
+## Bonus
 
-## Mentionnées par le sujet
+Après avoir eu un aperçu des algorithmes demandés pour les bonus, j’ai décidé de ne pas les faire tout de suite au vu de mes lacunes en mathématiques (par exemple le produit scalaire dans **Bernstein-Vazirani**, cela n’a pas l’air essentiel pour le code mais je préfère avoir une compréhension générale plus poussée des mathématiques impliqués). Je compte y revenir plus tard une fois que j’aurai obtenu un math qui me satisfait.
+
+En attendant voici les quelques notes et ressources que j'ai récupérés sur ces algorithmes !
+
+- **Bernstein-Vazirani** est l’algorithme le plus simple des trois et sert principalement d'illustration des capacités des ordinateurs quantiques pour résoudre les problèmes d'oracle en une seule requête. Il ne dépend pas de Simon ou de Shor, mais il introduit des concepts comme la superposition, les oracles quantiques, et la mesure, qui sont communs aux trois algorithmes.
+- L’algorithme de **Simon**, plus complexe, introduit des concepts comme la recherche de motifs cachés ou de symétries dans les fonctions, ce qui est fondamental pour l'algorithme de Shor. L'algorithme de Simon est souvent considéré comme un précurseur de l'algorithme de Shor, car il illustre le principe de résolution de problèmes en exploitant des structures cachées grâce à des techniques de mesures quantiques spécifiques.
+- **Shor** est l'algorithme le plus avancé, et il utilise des idées similaires à celles de Simon (comme la recherche de période), mais il les étend en utilisant la transformée de Fourier quantique (QFT) pour résoudre des problèmes de factorisation. Shor, donc, est inspiré par les techniques de Simon, mais il introduit une technique supplémentaire, la QFT, qui permet la recherche de périodes dans un contexte multiplicatif.
+
+### Bernstein-Vazirani
+
+L’algorithme de **Bernstein-Vazirani** permet de trouver un `masque secret` $s$ en une seule requête quantique, alors que les méthodes classiques nécessiteraient plusieurs queries. Cet algorithme résout un problème de type `oracle`, où une fonction $f(x)$ est définie de telle sorte que $f(x)=s \cdot x$ (produit scalaire modulo 2).
+
+Cette fonction $f$ est une boite noire qui, pour chaque entrée $x$, retourne le produit scalaire modulo 2 entre $x$ et $s$.
+
+C’est une version restreinte de **Deutsch-Jozsa** mais ici on veut trouver le masque $s$. Comme pour **Deutsch-Jozsa**, en utilisant un circuit quantique avec une superposition de tous les états de $x$, il est possible de découvrir $s$ en une seule requête a la fonction oracle la ou avec une implémentation classique il faudrait tester, dans le pire des cas, chaque bit de $s$ individuellement.
+
+<details>
+  <summary>Sources</summary>
+
+  [Algorithme de Bernstein-Vazirani | Wikipedia](https://fr.wikipedia.org/wiki/Algorithme_de_Bernstein-Vazirani)
+
+  [Bernstein-Vazirani Algorithm - Qiskit Textbook | Github](https://github.com/Qiskit/textbook/blob/main/notebooks/ch-algorithms/bernstein-vazirani.ipynb)
+
+  [Bernstein-Vazirani Algorithm - Qiskit Community Tutorials | Github](https://github.com/qiskit-community/qiskit-community-tutorials/blob/master/algorithms/bernstein_vazirani.ipynb)
+
+  [The Bernstein-Vazirani Algorithm: Quantum Algorithms Untangled | Medium](https://medium.com/quantum-untangled/the-bernstein-vazirani-algorithm-quantum-algorithms-untangled-67e58d4a5096)
+
+  [Learn Quantum Computing with Qiskit: Bernstein-Vazirani Algorithm | Medium](https://medium.com/@_monitsharma/learn-quantum-computing-with-qiskit-bernstein-vazirani-algorithm-fa1300517624)
+
+  [IQIS Lecture 6.7 — The Bernstein-Vazirani algorithm - Artur Ekert | Youtube](https://www.youtube.com/watch?v=60OHCftlqbA)
+</details>
+
+### Simon
+
+L’algorithme de **Simon** résout le `problème de Simon`, qui consiste a trouver un motif cache $s$ pour une fonction $f(x)$ vérifiant $f(x) = f(x \otimes s)$, où $\otimes$ est l’addition modulo 2 (XOR). L’objectif est de découvrir le motif $s$ qui est un vecteur binaire inconnu.
+
+On a encore une fois un oracle quantique évaluant $f(x)$.
+
+Grace a l’intrication et a la mesure quantique, on peut obtenir plusieurs équations linéaires en $s$ (sous forme de vecteurs indépendants).
+
+Après avoir obtenu suffisamment d’équations, on résout le système pour identifier $s$.
+
+Avec une implémentation classique, ce problème nécessite un nombre exponentiel d’évaluations de $f(x)$, tandis que l’algorithme quantique de Simon ne nécessite qu’un nombre polynomial d’étapes.
+
+Cet algorithme est un précurseur a celui de **Shor** car il démontre (entre autre) comment utiliser les propriétés quantiques pour découvrir des structures cachées dans des fonctions.
+
+<details>
+  <summary>Sources</summary>
+
+  [Simon's Problem | Wikipedia](https://en.wikipedia.org/wiki/Simon%27s_problem)
+
+  [Simon's Algorithm - Qiskit Textbook | Github](https://github.com/Qiskit/textbook/blob/main/notebooks/ch-algorithms/simon.ipynb)
+
+  [Simon's Algorithm - Qiskit Community Tutorials | Github](https://github.com/qiskit-community/qiskit-community-tutorials/blob/master/algorithms/simon_algorithm.ipynb)
+
+  [Simon’s Algorithm: Quantum Algorithms Untangled | Medium](https://medium.com/quantum-untangled/simons-algorithm-quantum-algorithms-untangled-62c8f81ed27a)
+
+  [IQIS Lecture 6.8 — Simon's algorithm - Artur Ekert | Youtube](https://www.youtube.com/watch?v=sxIdRKTdRRU)
+</details>
+
+### Shor
+
+L'algorithme de **Shor** est célèbre pour sa capacité à factoriser de grands nombres entiers en facteurs premiers de manière exponentiellement plus rapide que les algorithmes classiques, résolvant ainsi un problème central de la cryptographie.
+
+La factorisation des nombres est reliée à la recherche de la période d'une fonction exponentielle modulaire, c’est-à-dire le plus petit entier $r$ pour lequel $a^r \equiv 1 \mod N$ où $N$ est le nombre à factoriser et $a$ est un nombre choisi aléatoirement.
+
+En utilisant la transformée de Fourier quantique (Quantum Fourier Transform, QFT), l’algorithme de **Shor** peut détecter cette période efficacement.
+
+Une fois la période $r$ trouvée, des techniques de mathématiques classiques permettent de dériver des facteurs premiers de $N$ avec une probabilité élevée.
+
+Cet algorithme s’appuie sur des concepts similaires a ceux de l’algorithme de **Simon** (recherche de périodes et utilisation d’oracles quantiques).
+C’est aussi l’un des plus puissants en cryptographie quantique, car il peut casser les systèmes cryptographiques bases sur la difficulté de factorisation (comme RSA).
+
+<details>
+  <summary>Sources</summary>
+
+  [Algorithme de Shor](https://fr.wikipedia.org/wiki/Algorithme_de_Shor)
+
+  [Shor's Algorithm — Programming on Quantum Computers — Coding with Qiskit S2E7 | Youtube](https://www.youtube.com/watch?v=EdJ7RoWcU48)
+
+  [The Story of Shor's Algorithm, Straight From the Source | Peter Shor - Qiskit | Youtube](https://www.youtube.com/watch?v=6qD9XElTpCE)
+
+  [Shor's Algorithm - Qiskit Textbook | Github](https://github.com/Qiskit/textbook/blob/main/notebooks/ch-algorithms/shor.ipynb)
+
+  [Shor's Algorithm - Qiskit Community Tutorials | Github](https://github.com/qiskit-community/qiskit-community-tutorials/blob/master/algorithms/shor_algorithm.ipynb)
+
+  [Shor’s Algorithm Explained & Implemented using IBM Qiskit | Medium](https://medium.com/@chebilmohamedaziz04/shors-algorithm-explained-implemented-using-ibm-qiskit-58ad6ce53c00)
+
+  [Learn Quantum Computing with Qiskit: Shor’s Algorithm | Medium](https://medium.com/@_monitsharma/learn-quantum-computing-with-qiskit-shors-algorithm-971b3f6d8795)
+
+  [Demonstration of Shor’s factoring algorithm for N=21 on IBM quantum processors | Nature](https://www.nature.com/articles/s41598-021-95973-w)
+
+  [IQIS Lecture 6.9 — Shor's algorithm - Artur Ekert | Youtube](https://www.youtube.com/watch?v=TioipZX7d5U)
+</details>
+
+## Documentation
+
+### Mentionnées par le sujet
 
 [La lévitation quantique - Julien Bobroff, à l'USI | Youtube](https://www.youtube.com/watch?v=6kg2yV_3B1Q)
 
@@ -415,7 +513,7 @@ Vidéos interéssantes (There is more to explore here) sur le sujet de [David Lo
 
 [L'univers à portée de main - Christophe Galfard | Anna's archive](https://annas-archive.org/md5/841df5dfbae95a35308591344058e517)
 
-## Divers
+### Divers
 
 [L'informatique quantique, c'est simple, en fait. - V2F | Youtube](https://www.youtube.com/watch?v=wfXs7QXy4IU)
 

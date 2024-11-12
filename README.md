@@ -20,7 +20,8 @@ The subject for this exercice asked the following:
     > - List all available quantum simulators with their current queue.
     > - List all available quantum computers with their current queue and the number of qubits they have.
 
-The function `IBMQ.get_provider()` and the object `IBMQ` are deprecated since the version 0.40.0 of the package `qiskit-ibmq-provider` and 0.20.0 of Qiskit. They were deleted with the version 1.0.0 of Qiskit.
+> [!WARNING]
+> The function `IBMQ.get_provider()` and the object `IBMQ` are deprecated since the version 0.40.0 of the package `qiskit-ibmq-provider` and 0.20.0 of Qiskit. They were deleted with the version 1.0.0 of Qiskit.
 
 I attempted to create an environment with a previous version of Qiskit but I was not able to make it work. See the dedicated branch if you're interested: https://github.com/Killian-Morin/ftl_quantum/tree/qiskit_pre_0.40.0
 
@@ -92,7 +93,7 @@ Since we launch the circuit one time, the result will be at `[0]`, the `metadata
 <details>
   <summary>Sources</summary>
 
-  [How to sample a Bell State using Qiskit - Qiskit Youtube](https://www.youtube.com/watch?v=9MOIBcYf9wk)
+  [How to sample a Bell State using Qiskit - Qiskit | Youtube](https://www.youtube.com/watch?v=9MOIBcYf9wk)
 
   [What are ISA circuits? - IBM Quantum Blog](https://www.ibm.com/quantum/blog/isa-circuits)
 </details>
@@ -167,9 +168,9 @@ At step 5. we do the inverse operation of step 2., we would end up with the quan
 
 If we execute the algorithm on a real computer and not a simulator we would have to account for _noise_. We couldn't get back the oracle type with certainty, unlike with the execution on a simulator.
 
-## Résultats
+### Résultats
 
-### Constant
+#### Constant
 
 The qubits are at `0` when the Oracle is **constant**.
 
@@ -177,7 +178,7 @@ The qubits are at `0` when the Oracle is **constant**.
 | ------------- | ------------- |
 | ![Deutsch-Jozsa constant oracle result (simulateur)](data/img/deutsch_jozsa_constant_result_sim.png) | ![Deutsch-Jozsa constant oracle result (hardware)](data/img/deutsch_jozsa_constant_result.png) |
 
-### Balanced
+#### Balanced
 
 The qubits are at `1` when the Oracle is **balanced**.
 
@@ -302,7 +303,7 @@ This step can be repeated $\frac{\pi}{4} \sqrt{N}$ times in order to have the be
 https://github.com/Qiskit/textbook/blob/main/notebooks/ch-algorithms/grover.ipynb
 >
 
-## Results
+### Results
 
 Using the oracle given as example in the subject:
 <div style="text-align: center;">
@@ -356,20 +357,115 @@ Using this circuit, we can easily adjust some gates, the `compose` part to see t
 
   [A Visual Introduction to Grover's Algorithm and Reflections - Gordon Ma | Youtube](https://www.youtube.com/watch?v=c30KrWjHaw4)
 
-  [Grover's Algorithm | Qiskit Textbook](https://github.com/Qiskit/textbook/blob/main/notebooks/ch-algorithms/grover.ipynb)
+  [Grover's Algorithm - Qiskit Textbook | Github](https://github.com/Qiskit/textbook/blob/main/notebooks/ch-algorithms/grover.ipynb)
 
   [Grover's Algorithm | IBM Quantum Learning](https://learning.quantum.ibm.com/tutorial/grovers-algorithm)
 
   [GroverOperator | IBM Quantum Documentation](https://docs.quantum.ibm.com/api/qiskit/qiskit.circuit.library.GroverOperator)
 
-  [Grover's Algorithm - Qiskit Tutorials](https://github.com/Qiskit/qiskit-tutorials/blob/master/tutorials/algorithms/06_grover.ipynb) -> use of `Grover` deprecated class, so not really useful
+  [Grover's Algorithm - Qiskit Community Tutorials | Github](https://github.com/Qiskit/qiskit-tutorials/blob/master/tutorials/algorithms/06_grover.ipynb) -> use of `Grover` deprecated class, so not really useful
 
   [Grover's Quantum Search Algorithm, Geometric Visualization, Quantum Circuit Diagram - Elucydia | Youtube](https://www.youtube.com/watch?v=en9qMDo-CDY)
 </details>
 
-# Documentation
+## Bonus
 
-## List given in the subject
+After getting a taste of the algorithms requested for the bonuses, I decided not to do them just yet in view of my math shortcomings (e.g. the scalar product in **Bernstein-Vazirani**, it doesn't seem essential for the code but I'd rather have a more thorough general understanding of the math involved). I plan to come back to it later once I worked on math skills.
+
+In the meantime, here are the notes and resources I've gathered on these algorithms for the moment !
+
+- **Bernstein-Vazirani** is the simplest of the three algorithms and serves primarily as an illustration of the capabilities of quantum computers to solve oracle problems in a single query. It does not depend on **Simon** or **Shor**, but introduces concepts such as superposition, quantum oracles and measurement, which are common to all three algorithms and a reminder of **Deutsch-Jozsa Algorithm**.
+- The **Simon** algorithm is a more complex one, it introduces concepts such as the search for hidden patterns or symmetries in functions, which are fundamental to the **Shor algorithm**. **Simon's algorithm** is often considered a precursor to **Shor's algorithm**, as it illustrates the principle of solving problems by exploiting hidden structures using specific quantum measurement techniques.
+- **Shor's Algorithm** is the most advanced one, and uses ideas similar to **Simon's** (such as period search), but extends them by using the quantum Fourier transform (`QFT`) to solve factorization problems, this enables period search in a multiplicative context.
+
+### Bernstein-Vazirani
+
+The **Bernstein-Vazirani** algorithm makes it possible to find a `secret mask` $s$ using a single quantum query, whereas conventional methods would require several queries. This algorithm solves an `oracle' problem, where a function $f(x)$ is defined such that $f(x)=s \cdot x$ (scalar product modulo 2).
+
+This function $f$ is a black box which, for each input $x$, returns the modulo 2 scalar product between $x$ and $s$.
+
+It's a restricted version of **Deutsch-Jozsa Algorithm**, but here we want to find the $s$ mask. Similar to **Deutsch-Jozsa**, by using a quantum circuit with a superposition of all states of $x$, it's possible to discover $s$ in a single query to the oracle function, whereas, with a classical implementation you'd have to test, in the worst case, each bit of $s$ individually.
+
+<details>
+  <summary>Sources</summary>
+
+  [Algorithme de Bernstein-Vazirani | Wikipedia](https://fr.wikipedia.org/wiki/Algorithme_de_Bernstein-Vazirani)
+
+  [Bernstein-Vazirani Algorithm - Qiskit Textbook | Github](https://github.com/Qiskit/textbook/blob/main/notebooks/ch-algorithms/bernstein-vazirani.ipynb)
+
+  [Bernstein-Vazirani Algorithm - Qiskit Community Tutorials | Github](https://github.com/qiskit-community/qiskit-community-tutorials/blob/master/algorithms/bernstein_vazirani.ipynb)
+
+  [The Bernstein-Vazirani Algorithm: Quantum Algorithms Untangled | Medium](https://medium.com/quantum-untangled/the-bernstein-vazirani-algorithm-quantum-algorithms-untangled-67e58d4a5096)
+
+  [Learn Quantum Computing with Qiskit: Bernstein-Vazirani Algorithm | Medium](https://medium.com/@_monitsharma/learn-quantum-computing-with-qiskit-bernstein-vazirani-algorithm-fa1300517624)
+
+  [IQIS Lecture 6.7 — The Bernstein-Vazirani algorithm - Artur Ekert | Youtube](https://www.youtube.com/watch?v=60OHCftlqbA)
+</details>
+
+### Simon
+
+The **Simon** algorithm solves the `Simon problem`, which consists of finding a hidden pattern $s$ for a function $f(x)$ verifying $f(x) = f(x \otimes s)$, where $\otimes$ is the addition modulo 2 (XOR). The aim is to discover the pattern $s$, which is an unknown binary vector by using a quantum oracle evaluating $f(x)$.
+
+Thanks to entanglement and quantum measurement, we can obtain several linear equations in $s$ (in the form of independent vectors).
+
+Once enough equations have been obtained, the system is solved to identify $s$.
+
+With a classical implementation, this problem requires an exponential number of evaluations of $f(x)$, whereas **Simon's** quantum algorithm requires only a polynomial number of steps.
+
+This algorithm is a precursor to **Shor's Algorithm** as it demonstrates how to use quantum properties to discover hidden structures in functions.
+
+<details>
+  <summary>Sources</summary>
+
+  [Simon's Problem | Wikipedia](https://en.wikipedia.org/wiki/Simon%27s_problem)
+
+  [Simon's Algorithm - Qiskit Textbook | Github](https://github.com/Qiskit/textbook/blob/main/notebooks/ch-algorithms/simon.ipynb)
+
+  [Simon's Algorithm - Qiskit Community Tutorials | Github](https://github.com/qiskit-community/qiskit-community-tutorials/blob/master/algorithms/simon_algorithm.ipynb)
+
+  [Simon’s Algorithm: Quantum Algorithms Untangled | Medium](https://medium.com/quantum-untangled/simons-algorithm-quantum-algorithms-untangled-62c8f81ed27a)
+
+  [IQIS Lecture 6.8 — Simon's algorithm - Artur Ekert | Youtube](https://www.youtube.com/watch?v=sxIdRKTdRRU)
+</details>
+
+### Shor
+
+The **Shor** algorithm is famous for its ability to factor large integers into prime factors exponentially faster than conventional algorithms, thus solving a central problem in cryptography.
+
+Factoring numbers is related to finding the period of a modular exponential function, i.e. the smallest integer $r$ for which $a^r \equiv 1 \mod N$ where $N$ is the number to be factored and $a$ is a randomly chosen number.
+
+Using the Quantum Fourier Transform (QFT), the **Shor** algorithm can detect this period efficiently.
+
+Once the period $r$ has been found, classical mathematical techniques can be used to derive prime factors of $N$ with high probability.
+
+This algorithm is based on concepts similar to those of **Simon** (period search and use of quantum oracles).
+It is also one of the most powerful in quantum cryptography, as it can break cryptographic systems based on factoring difficulty (such as RSA).
+
+<details>
+  <summary>Sources</summary>
+
+  [Shor's Algorithm | Wikipedia](https://en.wikipedia.org/wiki/Shor%27s_algorithm)
+
+  [Shor's Algorithm — Programming on Quantum Computers — Coding with Qiskit S2E7 | Youtube](https://www.youtube.com/watch?v=EdJ7RoWcU48)
+
+  [The Story of Shor's Algorithm, Straight From the Source | Peter Shor - Qiskit | Youtube](https://www.youtube.com/watch?v=6qD9XElTpCE)
+
+  [Shor's Algorithm - Qiskit Textbook | Github](https://github.com/Qiskit/textbook/blob/main/notebooks/ch-algorithms/shor.ipynb)
+
+  [Shor's Algorithm - Qiskit Community Tutorials | Github](https://github.com/qiskit-community/qiskit-community-tutorials/blob/master/algorithms/shor_algorithm.ipynb)
+
+  [Shor’s Algorithm Explained & Implemented using IBM Qiskit | Medium](https://medium.com/@chebilmohamedaziz04/shors-algorithm-explained-implemented-using-ibm-qiskit-58ad6ce53c00)
+
+  [Learn Quantum Computing with Qiskit: Shor’s Algorithm | Medium](https://medium.com/@_monitsharma/learn-quantum-computing-with-qiskit-shors-algorithm-971b3f6d8795)
+
+  [Demonstration of Shor’s factoring algorithm for N=21 on IBM quantum processors | Nature](https://www.nature.com/articles/s41598-021-95973-w)
+
+  [IQIS Lecture 6.9 — Shor's algorithm - Artur Ekert | Youtube](https://www.youtube.com/watch?v=TioipZX7d5U)
+</details>
+
+## Documentation
+
+### List given in the subject
 [Julien Bobroff’s conference at USI on quantum levitation (in French) - Youtube](https://www.youtube.com/watch?v=6kg2yV_3B1Q)
 
 [David Louapre Physique Quantique (in French) - Youtube](https://www.youtube.com/results?search_query=david+louapre+physique+quantique)
@@ -394,7 +490,7 @@ Useful videos (There is more to explore here) of [David Louapre (in French) - Sc
 
 [The Universe in your hand - Christophe Galfard - Archive.org](https://archive.org/details/universeinyourha0000galf_w4p7)
 
-## Divers
+### Divers
 
 [L'informatique quantique, c'est simple, en fait. - V2F | Youtube](https://www.youtube.com/watch?v=wfXs7QXy4IU)
 
