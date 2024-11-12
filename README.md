@@ -2,6 +2,8 @@
 
 _You can read this in [french](README.fr.md)_
 
+The file [explications_diverses.md](explications_divers.md) is a placeholder file where you can find some of my documentation on subjects like Qiskit, quantum but everything is in French.
+
 My version of the project requires an `.env` file.
 
 It contains a `TOKEN` field, whose value is your IMBQ API token, which you can obtain from https://quantum.ibm.com/
@@ -65,7 +67,7 @@ The goal of this exercice is to discover what is **quantum noise**. This 'noise'
 Those intermediary states leads to unexpected results among the possible quantum states. In the histogram for quantum hardware, the noise corresponds to the states `01` and `10`.
 
 | Results with a simulator (ex03)  |  Results with quantum hardware (ex04) |
-| :-------------: | :-------------: |
+| ------------- | ------------- |
 | ![entanglement](data/img/entanglement.png) | ![quantum noise](data/img/quantum_noise.png) |
 
 > “The main source of failure in a quantum computer is noise, which comes from rogue forms of energy creeping into the quantum computer making the qubits drift away from where they should be and causing errors.” https://www.youtube.com/watch?v=-UlxHPIEVqA&t=1400s
@@ -172,7 +174,7 @@ If we execute the algorithm on a real computer and not a simulator we would have
 The qubits are at `0` when the Oracle is **constant**.
 
 | Results with a simulator | Results with real quantum hardware |
-| :-------------: | :-------------: |
+| ------------- | ------------- |
 | ![Deutsch-Jozsa constant oracle result (simulateur)](data/img/deutsch_jozsa_constant_result_sim.png) | ![Deutsch-Jozsa constant oracle result (hardware)](data/img/deutsch_jozsa_constant_result.png) |
 
 ### Balanced
@@ -180,7 +182,7 @@ The qubits are at `0` when the Oracle is **constant**.
 The qubits are at `1` when the Oracle is **balanced**.
 
 | Results with a simulator | Results with real quantum hardware |
-| :-------------: | :-------------: |
+| ------------- | ------------- |
 | ![Deutsch-Jozsa balanced oracle result (simulateur)](data/img/deutsch_jozsa_balanced_result_sim.png) | ![Deutsch-Jozsa balanced oracle result (hardware)](data/img/deutsch_jozsa_balanced_result.png) |
 
 
@@ -323,7 +325,7 @@ We get the following circuit after initializing the 3 qubits of the system, comb
 The oracle from the subject put a stamp on the state `111`, some results we can obtain:
 
 | Results with a simulator | Results with quantum hardware |
-| :-------------: | :-------------: |
+| ------------- | ------------- |
 | ![Grover's algorithm histogram (simulator)](data/img/grover_sim_histogram.png) | ![Grover's algorithm histogram (hardware)](data/img/grover_real_histogram.png) |
 | ![Grover's algorithm distribution (simulator)](data/img/grover_sim_distribution.png) | ![Grover's algorithm distribution (hardware)](data/img/grover_real_distribution.png) |
 

@@ -2,6 +2,8 @@
 
 _Pour lire ce readme en [anglais](README.md)_
 
+Le fichier [explications_diverses.md](explications_divers.md) contient un regroupement de documentation sur plusieurs sujets (Qiskit, quantique ...).
+
 Ma version du projet nécessite un fichier `.env`.
 
 Celui-ci contient une variable `TOKEN` dont la valeur est le token API de IMBQ que l'on peut obtenir de https://quantum.ibm.com/
@@ -65,7 +67,7 @@ Le but de cet exercice est de découvrir ce qu'est le **Quantum noise**. C'est d
 Cela provoque des resultats auxquels on ne s'attend pas parmi les états quantiques possibles (dans l'histogramme pour l'ordinateur quantique, cela correspond aux états `01` et `10` lors de l'exécution avec un hardware quantique).
 
 | Résultats dans un simulateur (ex03) | Résultats avec un ordinateur quantique (ex04) |
-| :-------------: | :-------------: |
+| ------------- | ------------- |
 | ![entanglement](data/img/entanglement.png) | ![quantum noise](data/img/quantum_noise.png) |
 
 > “The main source of failure in a quantum computer is noise, which comes from rogue forms of energy creeping into the quantum computer making the qubits drift away from where they should be and causing errors.” https://www.youtube.com/watch?v=-UlxHPIEVqA&t=1400s
@@ -182,7 +184,7 @@ Avec un hardware, le bruit sa provoquer des états où pour certains résultats 
 Les qubits sont à `0` lorsque l'oracle est **constant**.
 
 | Résultats avec un simulateur | Résultats avec un ordinateur quantique |
-| :-------------: | :-------------: |
+| ------------- | ------------- |
 | ![Deutsch-Jozsa oracle constant résultats (simulateur)](data/img/deutsch_jozsa_constant_result_sim.png) | ![Deutsch-Jozsa oracle constant résultats (hardware)](data/img/deutsch_jozsa_constant_result.png) |
 
 ### Balanced
@@ -190,7 +192,7 @@ Les qubits sont à `0` lorsque l'oracle est **constant**.
 Les qubits sont à `1` lorsque l'oracle est **balanced**.
 
 | Résultats avec un simulateur | Résultats avec un ordinateur quantique |
-| :-------------: | :-------------: |
+| ------------- | ------------- |
 | ![Deutsch-Jozsa oracle balanced résultats (simulateur)](data/img/deutsch_jozsa_balanced_result_sim.png) | ![Deutsch-Jozsa oracle balanced résultats (hardware)](data/img/deutsch_jozsa_balanced_result.png) |
 
 
@@ -343,7 +345,7 @@ On obtient le circuit suivant après avoir initialisé les états des 3 qubits d
 L'oracle du sujet marque l'état `111`, d'où les résultats suivants:
 
 | Résultats avec un simulateur | Résultats avec un ordinateur quantique |
-| :-------------: | :-------------: |
+| ------------- | ------------- |
 | ![Algorithme de Grover histogramme (simulateur)](data/img/grover_sim_histogram.png) | ![Algorithme de Grover histogramme (hardware)](data/img/grover_real_histogram.png) |
 | ![Algorithme de Grover distribution (simulateur)](data/img/grover_sim_distribution.png) | ![Algorithme de Grover distribution (hardware)](data/img/grover_real_distribution.png) |
 
