@@ -306,12 +306,10 @@ C’est ensuite utilisé par le diffuser qui va augmenter la probabilité pour c
 
 ### Step 3: Le diffuser
 
-“L’opérateur de Grover” possède la forme $\text{\^{G}}
- = (\text{\^{H}} \text{\^{Z}} \text{\^{H}}) \text{\^{O}}$ où
+“L’opérateur de Grover” possède la forme $\hat{G} = (\hat{H} \hat{Z} \hat{H}) \hat{O}$ où
 
-$\text{\^{O}}$ est l’oracle, $\text{\^{H}}$ est l’opérateur/transformée d’Hadamard, $\text{\^{Z}}$ est l’opérateur `Zero phase shift` défini comme $\text{\^{Z}} = 2 \ket{0} \bra{0} - \text{\^{I}}$ ($\text{\^{I}}$ étant l’opérateur d’identité)
-
-$\text{\^{H}} \text{\^{Z}} \text{\^{H}}$ est l’**opérateur de diffusion de Grover**
+  - $\hat{O}$ est l’oracle, $\hat{H}$ est l’opérateur/transformée d’Hadamard, $\hat{Z}$ est l’opérateur `Zero phase shift` défini comme $\hat{Z} = 2 \ket{0} \bra{0} - \hat{I}$ ($\hat{I}$ étant l’opérateur d’identité)
+  - $\hat{H} \hat{Z} \hat{H}$ est l’**opérateur de diffusion de Grover**
 
 C’est cet opérateur qui va inverser les états autour de la moyenne, *le miroir des amplitudes autour de la moyenne des amplitudes*.
 Cela permet d'amplifier l'état cible et de diminuer les autres états.
