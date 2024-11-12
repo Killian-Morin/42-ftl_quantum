@@ -1,25 +1,8 @@
-<h1>Documentation Générale</h1>
+# Documentation Générale
 
 Ce fichier contient une partie de mes notes (non organisées et en français) sur différentes notions du projet (Qiskit, quantique ...).
 
-<style>
-  #h2 {
-    background-color: violet;
-    text-decoration-line: underline;
-  }
-
-  #h3 {
-    background-color: yellow;
-    text-decoration-line: underline;
-  }
-
-  #h4 {
-    background-color: blue;
-    text-decoration-line: underline;
-  }
-</style>
-
-<h2>Qiskit</h2>
+## Qiskit
 
 `assemble()`: Assemble une liste de circuits (`QuantumCircuit`) ou de schedule en un `Qobj` qui peut être run sur un backend.
 
@@ -43,7 +26,7 @@ https://learning.quantum.ibm.com/tutorial/compare-transpiler-settings
 
 <hr>
 
-<h3>Instances</h3>
+### Instances
 
 L’accès aux services de IBM Quantum sont contrôlés par les *instances* (anciennement *providers*) auxquels chaque utilisateur est assigné.
 
@@ -59,9 +42,9 @@ https://docs.quantum.ibm.com/guides/instances
 
 <hr>
 
-<h3>QuantumCircuit - class</h3>
+### QuantumCircuit - class
 
-<h4>`measure()`</h4>
+#### `measure()`
 
 `measure(qubit, cbit)`: Mesure un bit quantique (`*qubit*`) en une base Z vers un bit classique (`*cbit*`). Le premier paramètre est le qubit à mesurer, le second est le bit classique où placer le résultat de la mesure. Quand un état quantique est mesuré, un qubit est projeté sur la base *computational*, équivalent à une base canonique pour chaque qubit, (Pauli Z) à $\ket{0}$ ou $\ket{1}$. Le bit classique `*cbit*` indique le résultat de cette projection en un $0$ ou un $1$.
 
@@ -69,17 +52,17 @@ https://quantumcomputing.stackexchange.com/questions/1410/what-is-meant-by-the-t
 
 $\color{#8cecb6}\rule{500px}{1.5px}$
 
-<h4>`measure_all()`</h4>
+#### `measure_all()`
 
 `measure_all()`: ne prend pas d’argument et peut être appliquée à un circuit qui peut ne pas avoir de bits classique prédéfini. Elle va créer les fils classiques, stockés les résultats des mesures dans l’ordre et ajoutée une barrière avant la mesure.
 
 <hr>
 
-<h3>Result and visualization</h3>
+### Result and visualization
 
 https://docs.quantum.ibm.com/api/qiskit/visualization
 
-<h4>`plot_histogram()`</h4>
+#### `plot_histogram()`
 
 render un histogramme d’une `list` ou un `dict`, provenant généralement de mesure d’un système.
 
@@ -87,7 +70,7 @@ https://docs.quantum.ibm.com/api/qiskit/qiskit.visualization.plot_histogram
 
 $\color{#8cecb6}\rule{500px}{1.5px}$
 
-<h4>`plot_state_city()`</h4>
+#### `plot_state_city()`
 
 render un état quantique en une image de building avec 2 set de barres de graphes pour les parties réelles et imaginaires de la matrice représentant l’état.
 
@@ -111,7 +94,7 @@ https://quantumcomputing.stackexchange.com/questions/6731/the-meaning-of-the-cit
 
 $\color{#8cecb6}\rule{500px}{1.5px}$
 
-<h4>`array_to_latex()`</h4>
+#### `array_to_latex()`
 
 ```python
 vector = array_to_latex(result.get_statevector(), source=True)
@@ -122,7 +105,7 @@ https://docs.quantum.ibm.com/api/qiskit/qiskit.visualization.array_to_latex
 
 $\color{#8cecb6}\rule{500px}{1.5px}$
 
-<h4>`QuantumCircuit.draw()`</h4>
+#### `QuantumCircuit.draw()`
 
 Visualisation d’un `QuantumCircuit` via sa méthode `draw()`
 
@@ -130,7 +113,7 @@ https://docs.quantum.ibm.com/api/qiskit/qiskit.circuit.QuantumCircuit#qiskit.cir
 
 $\color{#8cecb6}\rule{500px}{1.5px}$
 
-<h4>Visualisation du vecteur d’état (statevector) d’un circuit</h4>
+#### Visualisation du vecteur d’état (statevector) d’un circuit
 
 Visualisation du vecteur d’état (statevector) d’un circuit, avant de placer les mesures, donc selon des probabilités idéales (e.g. 0.5 pour chaque état si deux possibilités).
 
@@ -145,7 +128,7 @@ plot_histogram(ideal_distribution, title="Ideal distribution of this circuit", f
 
 <hr>
 
-<h3>Primitives</h3>
+### Primitives
 
 *primitive unified bloc* (PUB)
 
@@ -161,7 +144,7 @@ https://docs.quantum.ibm.com/api/qiskit-ibm-runtime/qiskit_ibm_runtime.SamplerV2
 
 <hr>
 
-<h3>Aer</h3>
+### Aer
 
 Package s’intégrant à Qiskit offrant des simulateurs d’ordinateurs quantiques avec des modèles de bruits réalistes.
 
@@ -171,7 +154,7 @@ Package s’intégrant à Qiskit offrant des simulateurs d’ordinateurs quantiq
 
 $\color{#8cecb6}\rule{500px}{1.5px}$
 
-<h4>AerSimulator - class</h4>
+#### AerSimulator - class
 
 Noisy quantum circuit simulator backend.
 
@@ -199,9 +182,9 @@ https://qiskit.github.io/qiskit-aer/tutorials/1_aersimulator.html#Simulation-Met
 
 https://quantumcomputing.stackexchange.com/questions/27221/what-are-the-differences-in-using-qasm-statevector-and-unitary-simulators-in-q
 
-<h2>Quantique</h2>
+## Quantique
 
-<h3>qubit | q-bit</h3>
+### qubit | q-bit
 
 Un *qubit* est l’unité équivalente au *bit* en programmation quantique, i.e. l’unité de base pour stocker de l’information.
 
@@ -274,7 +257,7 @@ Pour des points (x, y, z), $\ket{0}$ correspond au point (0, 0, 1) et $\ket{1}$ 
 
 <hr>
 
-<h3>notation bra-ket / Dirak notation </h3>
+### notation bra-ket / Dirak notation
 
 Le monde quantique fonctionnant différemment du monde classique, une nouvelle notation mathématique est nécessaire pour représenter des objets dans la mécanique quantique.
 
@@ -311,7 +294,7 @@ Le *ket* contient généralement un vecteur de colonne, le *bra* un vecteur de l
 
 <hr>
 
-<h3>superposition</h3>
+### superposition
 
 En physique “classique”, il existe la superposition des vagues. Lorsque plusieurs vagues se superposent dans l’espace et le temps, la vague résultante est la somme de l’amplitude individuelle des vagues à chaque point dans l’espace et le temps. Ce principe s’applique à ≠ types de vagues: électromagnétiques (la lumière), sonore, d’eau. Une application de ce type de superposition est trouvé dans la technologie de réduction de bruit d’écouteurs.
 
@@ -327,7 +310,7 @@ Il existe ≠ techniques pour appliquer la superposition dans un ordinateur dest
 
 <hr>
 
-<h3>états communs</h3>
+### états communs
 
 Il existe des états de superpositions communs qui sont souvent utilisés dans la pq. Il en existe 4 et ont été nommés: *plus*, *minus*, *plus i* et *minus i*.
 
@@ -361,11 +344,11 @@ https://learning.edx.org/course/course-v1:LinuxFoundationX+LFQ103x+1T2023/block-
 
 <hr>
 
-<h3>intrication quantique - entanglement</h3>
+### intrication quantique - entanglement
 
 Il existe deux types d’états quantiques dans des systèmes composites: separable ou entangled.
 
-<h4>separable</h4>
+#### separable
 
 Un état séparable est un état quantique appartenant à un système composite qui peut être factorisé en des états individuels appartenant aux systèmes quantiques séparés.
 
@@ -383,7 +366,7 @@ Cela s’applique aussi pour des systèmes *triparties* ou *multipartites*, i.e.
 
 $\color{#8cecb6}\rule{500px}{1.5px}$
 
-<h4>entangled</h4>
+#### entangled
 
 Quand ce n’est pas possible de factoriser un état quantique appartenant à un système composite, on a un état *entangled* (intriqué, enchevêtré).
 
@@ -401,7 +384,7 @@ Deux qubits qui sont intriqués/entangled lorsqu’un est un mesuré, le résult
 
 <hr>
 
-<h3>Bell states</h3>
+### Bell states
 
 Les états de Bell sont un groupe de 4 états quantique composés de deux qubits.
 
@@ -428,9 +411,9 @@ Pour les états $\Psi$, le qubit B, une fois mesuré sera dans l’état opposé
 
 <hr>
 
-<h3>Quantum Gates</h3>
+### Quantum Gates
 
-<h4>gates</h4>
+#### gates
 
 Dans un circuit quantique, une porte quantique est un circuit quantique élémentaire qui performe des opérations sur un petit nombre de qubits, changeant ainsi un état quantique vers un autre type.
 
@@ -454,7 +437,7 @@ https://learning.quantum.ibm.com/tutorial/explore-gates-and-circuits-with-the-qu
 
 $\color{#8cecb6}\rule{500px}{1.5px}$
 
-<h4>X gate</h4>
+#### X gate
 
 C’est la porte Pauli-X, aussi appelée bit-flip, elle agit sur un unique qubit.
 
@@ -474,14 +457,17 @@ q_0: ┤ X ├
 représentée par la matrice de Pauli X:
 
 $$
-X = \begin{bmatrix}0 & 1\\1 & 0\end{bmatrix}
+X = \begin{bmatrix}
+0 & 1\\
+1 & 0
+\end{bmatrix}
 $$
 
 https://docs.quantum.ibm.com/api/qiskit/qiskit.circuit.library.XGate
 
 $\color{#8cecb6}\rule{500px}{1.5px}$
 
-<h4>Control NOT / CXGate</h4>
+#### Control NOT / CXGate
 
 Les portes contrôlées agissent sur plusieurs qubits où l’un agit comme un contrôle sur l’opération qui sera effectuée.
 
@@ -512,13 +498,23 @@ peut aussi être représenté de la manière suivante: https://fr.m.wikipedia.or
 représentée par la matrice suivante:
 
 $$
-X = \begin{bmatrix}1 & 0 & 0 & 0\\0 & 1 & 0 & 0\\0 & 0 & 0 & 1\\0 & 0 & 0 & 1\end{bmatrix}
+X = \begin{bmatrix}
+1 & 0 & 0 & 0\\
+0 & 1 & 0 & 0\\
+0 & 0 & 0 & 1\\
+0 & 0 & 0 & 1
+\end{bmatrix}
 $$
 
 dans ce sens la matrice est:
 
 $$
-X = \begin{bmatrix}1 & 0 & 0 & 0\\0 & 0 & 0 & 1\\0 & 0 & 1 & 0\\0 & 1 & 0 & 0\end{bmatrix}
+X = \begin{bmatrix}
+1 & 0 & 0 & 0\\
+0 & 0 & 0 & 1\\
+0 & 0 & 1 & 0\\
+0 & 1 & 0 & 0
+\end{bmatrix}
 $$
 
 Input
@@ -543,7 +539,7 @@ https://docs.quantum.ibm.com/api/qiskit/qiskit.circuit.library.CXGate
 
 $\color{#8cecb6}\rule{500px}{1.5px}$
 
-<h4>XOR</h4>
+#### XOR
 
 Symbolisé par $\oplus$.
 
@@ -558,7 +554,7 @@ https://docs.quantum.ibm.com/api/qiskit/qiskit.circuit.library.XOR
 
 $\color{#8cecb6}\rule{500px}{1.5px}$
 
-<h4>Hadamard gate</h4>
+#### Hadamard gate
 
 Cette porte est une rotation de pi autour des axes X+Y, cela à comme effet de changer la base de calcul (computation basis form) de $\ket{0},\ket{1}$ vers $\ket{+},\ket{-}$ et inversement.
 
@@ -586,7 +582,7 @@ $$
 
 https://docs.quantum.ibm.com/api/qiskit/qiskit.circuit.library.HGate
 
-<h3>quantum oracle</h3>
+### quantum oracle
 
 Un oracle quantique prend une string binaire $x$ en paramètre et sort en output une autre string binaire $f(x)$.
 
@@ -602,7 +598,7 @@ Dans la plupart des problèmes, l’input à l’oracle est dans un état superp
 
 $\color{#8cecb6}\rule{500px}{1.5px}$
 
-<h2>mécanique quantique</h2>
+## mécanique quantique
 
 La mécanique quantique est un ensemble de théories et de lois (dont on a pour le moment pas découvert de contradiction) qui sont appliqués aux unités physiques les plus petites de notre univers (à notre connaissance encore une fois) comme les atomes, les électrons, les particules subatomiques, les quarks, bosons …
 
@@ -612,7 +608,7 @@ L’interprétation de Copenhague de la mécanique quantique est un ensemble de 
 
 Le débat Bohr-Einstein est une série de conversations et de correspondances entre ces deux scientifiques qui c’est déroulée entre 1920 et 1940. Le débat était centré sur la nature de la mécanique quantique et de l’interprétation des ces principes, avec Bohr défendant l’interprétation de Copenhague (qu’il a participé à créer) et Einstein qui plaide pour une vue plus déterministe.
 
-<h3>postulats sur lesquels la mécanique quantique repose</h3>
+### postulats sur lesquels la mécanique quantique repose
 
 1. Un vecteur normé $\psi>=\sum_{i=1}^{n}c_i\ket{u_i}$ contient des données sur l’état de systèmes de mécanique quantique.
 
@@ -660,7 +656,7 @@ Le débat Bohr-Einstein est une série de conversations et de correspondances en
 
 $\color{#8cecb6}\rule{500px}{1.5px}$
 
-<h3>Schrödinger’s cat thought experiment</h3>
+### Schrödinger’s cat thought experiment
 
 Si l’on suit les lois de la mécanique quantique de l’interprétation de Copenhague, le chat est mort “*et”* vivant au même moment jusqu’à ce que l’on ouvre la boite et que l’on mesure l’état du chat.
 
@@ -681,7 +677,7 @@ ressources:
 
 $\color{#8cecb6}\rule{500px}{1.5px}$
 
-<h3>vecteur</h3>
+### vecteur
 
 Les états quantiques peuvent être imaginés comme des vecteurs.
 
@@ -697,7 +693,7 @@ La mécanique quantique ne spécifie pas que l’espace-temps est multidimension
 
 $\color{#8cecb6}\rule{500px}{1.5px}$
 
-<h3>états de base</h3>
+### états de base
 
 Les états de base d’un système quantique sont un set de states qui décrit tout les états possible du système. C’est possible d’utiliser des vecteurs pour illustrer ces états de base. Un vecteur bi-dimensionnel $\overrightarrow{α}$ peut être écrit comme suit: $\overrightarrow{α} = 2\^{i} + 2\^{j}$. Ici $\{{\^{i}, \^{j}}\}$ sont des vecteurs de bases qui se traduisent en états de bases avec la mécanique quantique. Il y a une infinité de vecteurs possible dans cet espace bi-dimensionnel, et chacun utilise les vecteurs de bases qui peuvent être décrit comme une combinaison linéaire. Une des propriétés des vecteurs de bases est que l’on peut générer n’importe quel vecteur grâce à leurs combinaison linéaire. Ainsi, n’importe quel état possible d’un système de mécanique quantique peut être générer grâce à la combinaison linéaire de leurs états de base.
 
@@ -724,7 +720,7 @@ $\color{#f80779}\rule{180px}{1.5px}$
 
 $\color{#8cecb6}\rule{500px}{1.5px}$
 
-<h3>mesure quantique</h3>
+### mesure quantique
 
 Une mesure quantique idéale est associée à un set d’opérateurs de projections, comme par exemple $P_m$ où $m$ est le résultat qui pourrait être obtenu après que $P_m$ est appliqué sur l’état quantique.
 
@@ -758,7 +754,7 @@ Avec ça, l’état initial qui était une superposition des deux états $\ket{v
 
 $\color{#8cecb6}\rule{500px}{1.5px}$
 
-<h2>applications de la programmation quantique</h2>
+## applications de la programmation quantique
 
 Les ordinateurs quantiques utilisent la mécanique quantique et ses propriétés pour effectuer ses calculs. Ce fait rend ces ordinateurs extrêmement sensible au bruit (noise) extérieur.
 
@@ -776,7 +772,7 @@ Un oracle ou boite noire est en programmation quantique une opération, non conn
 
 $\color{#8cecb6}\rule{500px}{1.5px}$
 
-<h3>critères de DiVincenzo</h3>
+### critères de DiVincenzo
 
 Groupe de guidelines pour évaluer la commodité d’utilisation d’ordinateurs quantiques proposées en 2000 par David DiVincenzo.
 
@@ -802,7 +798,7 @@ Groupe de guidelines pour évaluer la commodité d’utilisation d’ordinateurs
 
 $\color{#8cecb6}\rule{500px}{1.5px}$
 
-<h3>Quantum Circuit</h3>
+### Quantum Circuit
 
 Un circuit quantique est l’élément principal de la programmation quantique.
 
@@ -818,9 +814,9 @@ Dans la plupart des textes, le qubit en haut du circuit est la partie la plus à
 
 Avec Qiskit, le qubit du haut correspond à la partie droite du *ket* et le qubit du bas la partie gauche. e.g. $\ket{...q_2q_1q_0}$
 
-<h2>divers</h2>
+## divers
 
-<h3>voc</h3>
+### voc
 
 *Ansatz*: supposition de la valeur ou de la forme d’une fonction inconnue et aide à dériver la solution réelle d’une équation. En programmation quantique c’est généralement un circuit paramétré souvent utilisé dans des “variational algorithms”, il est utilisé comme un point de départ ou “trial state” qui sera mis à jour itérativement suivant les données qui ont été calculées. https://www.youtube.com/watch?v=mJqVFJsXfis
 
@@ -830,7 +826,7 @@ Avec Qiskit, le qubit du haut correspond à la partie droite du *ket* et le qubi
 
 $\color{#8cecb6}\rule{500px}{1.5px}$
 
-<h3>principe d’incertitude d’Heisenberg</h3>
+### principe d’incertitude d’Heisenberg
 
 Ce principe énonce qu’il existe des configurations dans lesquelles, deux propriétés (e.g. la longueur d’onde et la position d’une onde) ne peuvent pas conjointement être aussi précisément mesurées comme on le souhaite. Pour en mesurer une précisément, l’autre doit être imprécise.
 
@@ -838,13 +834,13 @@ https://www.youtube.com/watch?v=HqyJ7-ibUmo
 
 $\color{#8cecb6}\rule{500px}{1.5px}$
 
-<h3>distinction des sciences</h3>
+### distinction des sciences
 
 La mécanique quantique s’occupe d’examiner les propriétés de la matière à l’échelle microscopique, *quantum information science* se concentre sur l’extraction de données depuis ces propriétés et la programmation quantique sur la manipulation et le process de ces données.
 
 $\color{#8cecb6}\rule{500px}{1.5px}$
 
-<h3>Composite quantum systems</h3>
+### Composite quantum systems
 
 Un système quantique composite est formé d’une paire de système quantique qui possède un lien entre eux, l’un affectant l’autre même si les deux systèmes sont séparés physiquement.
 
@@ -856,7 +852,7 @@ Ce type de système est aussi désigné sous l’appellation ‘systèmes bipart
 
 $\color{#8cecb6}\rule{500px}{1.5px}$
 
-<h3>quantum parallelism</h3>
+### quantum parallelism
 
 https://www.quera.com/glossary/parallelism
 
@@ -864,7 +860,7 @@ https://arxiv.org/html/2405.07222v1
 
 $\color{#8cecb6}\rule{500px}{1.5px}$
 
-<h3>quantum interference</h3>
+### quantum interference
 
 L’interférence quantique c’est quand des particules subatomiques interagissent et s’influencent entre elles et d’autres particules alors qu’elles sont en un état probabiliste de superposition. Ce phénomène peut influencer la probabilité de sortie de l’état quantique lorsqu’il est mesuré.
 
