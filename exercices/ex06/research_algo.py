@@ -109,21 +109,22 @@ def oracle_creation():
 
     The oracle commented is one given in IBM Learning that marks two states as solution in a 3-qubit system
     """
+    # oracle = QuantumCircuit(3)
+
+    # oracle.x(2)
+
+    # oracle.compose(MCMT(ZGate(), 2, 1), inplace=True)
+
+    # oracle.x([0, 1, 2])
+
+    # oracle.compose(MCMT(ZGate(), 2, 1), inplace=True)
+
+    # oracle.x([0, 1])
+
+    # oracle.draw(output="mpl", filename="oracle_two_solution")
+
+    # return oracle
     return 0
-
-# oracle = QuantumCircuit(3)
-
-# oracle.x(2)
-
-# oracle.compose(MCMT(ZGate(), 2, 1), inplace=True)
-
-# oracle.x([0, 1, 2])
-
-# oracle.compose(MCMT(ZGate(), 2, 1), inplace=True)
-
-# oracle.x([0, 1])
-
-# oracle.draw(output="mpl", filename="oracle_two_solution")
 
 
 def diffuser(qc, oracle):

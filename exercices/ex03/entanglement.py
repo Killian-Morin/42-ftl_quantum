@@ -28,8 +28,8 @@ def process_result(counts, sim_type):
     print(f"\n{YELLOW}============================={RESET}")
 
     print(f"{BLUE}Measurements results ({sim_type} simulator):{RESET}")
-    print(f"\tfor the 00 state: {PURPLE}{counts['0']}{RESET} ({GREEN}{counts['0'] / SHOTS}{RESET})")
-    print(f"\tfor the 11 state: {PURPLE}{counts['1']}{RESET} ({GREEN}{counts['1'] / SHOTS}{RESET})")
+    print(f"\tfor the 00 state: {PURPLE}{counts['00']}{RESET} ({GREEN}{counts['00'] / SHOTS}{RESET})")
+    print(f"\tfor the 11 state: {PURPLE}{counts['11']}{RESET} ({GREEN}{counts['11'] / SHOTS}{RESET})")
 
     title = f"Counts measurement result obtained for the $\Phi^+$ Bell state with {SHOTS} shots on AerSimulator with method {sim_type}"
     plot_histogram(counts, title=title, filename="histogram_Phi_plus", figsize=(12, 8))
@@ -41,7 +41,7 @@ def process_result(counts, sim_type):
 def entanglement():
     """ Create a circuit that implement the principle of entanglement
 
-    * Create a circuit with 2 qubits and 1 classical bit
+    * Create a circuit with 2 qubits
     * Apply an Hadamard gate on q_0
     * Apply a CNOT gate with q_0 as control and q_1 as target
 
@@ -65,7 +65,7 @@ def entanglement():
     * Render the probabilities in a cityscape format
     """
 
-    qc = QuantumCircuit(2, 1)
+    qc = QuantumCircuit(2)
 
     qc.h(0)
 
@@ -76,7 +76,7 @@ def entanglement():
     # statevector = DensityMatrix(qc)
     # statevector = Statevector(qc)
 
-    qc.measure(0, 0)
+    qc.measure_all()
 
     print("\nASCII representation of the circuit:")
     print(qc)

@@ -40,7 +40,7 @@ def process_result(counts, sim_type):
 def superposition():
     """ Create a circuit to illustrate the principle of superposition
 
-    * Create the circuit with 1 qubit and 1 classical bit
+    * Create the circuit with 1 qubit
     * Apply an Hadamard gate on q_0 to create superposition
     * Apply the measurement tool to the circuit
     * Draw in the terminal and create a .png with the circuit
@@ -52,11 +52,11 @@ def superposition():
     * Process (print and plot) the result
     """
 
-    qc = QuantumCircuit(1, 1)
+    qc = QuantumCircuit(1)
 
     qc.h(0)
 
-    qc.measure(0, 0)
+    qc.measure_all()
 
     print("ASCII representation of the circuit:")
     print(qc)

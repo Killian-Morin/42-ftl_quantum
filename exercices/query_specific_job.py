@@ -108,7 +108,7 @@ def query_job():
 
     # * Plot the percentage result in a histogram
     title = rf"Percentage result of {job_id} with {shots} shots runned on {bck_name}"
-    plot_distribution(result_counts, title=title, filename=f"histogram_percentage_{job_id}_{bck_name}", figsize=(12, 8))
+    plot_distribution(result_counts, title=title, filename=f"distribution_percentage_{job_id}_{bck_name}", figsize=(12, 8))
 
 
 if __name__ == "__main__":
