@@ -5,11 +5,17 @@ all : build run connect
 run:
 	docker-compose -p ${NAME} up -d
 
-build:
+check_env:
+	@if [ ! -f .env ]; then \
+		echo ".env file is missing. Please add it before running this target."; \
+		exit 1; \
+	fi
+
+build: check_env
 	docker-compose -p ${NAME} build
 
 connect:
-	docker exec -it ftl_quantum /bin/bash
+	docker exec -it ${NAME} /bin/bash
 
 down:
 	docker-compose -p ${NAME} down
@@ -18,7 +24,7 @@ clean: down
 	docker system prune -af
 
 fclean: clean
-	rm ex*/*.png
-	rm *.png
+	rm -f exercices/*.png
+	rm -f exercices/ex*/*.png
 
-.PHONY: all run build connect down clean fclean
+.PHONY: all run check_env build connect down clean fclean

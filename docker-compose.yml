@@ -3,5 +3,5 @@ services:
     build: .
     container_name: ftl_quantum
     volumes:
-      - .:/usr/src/app
+      - ./exercices:/usr/src/app/exercices
     command: tail -f /dev/null

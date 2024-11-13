@@ -1,6 +1,6 @@
 FROM python:3.9-bullseye
 
-WORKDIR /usr/src/app
+WORKDIR /usr/src/app/
 
 RUN pip install --upgrade pip
 
@@ -14,8 +14,9 @@ RUN pip install --no-cache-dir \
     matplotlib \
     ipython
 
-# Copy '.' into the container at /usr/src/app
-COPY . .
+# Copy relevant files into the container at /usr/src/app
+COPY ./exercices ./exercices
+COPY .env ./.env
 
-# Command to keep the container running (not necessary with the way the container is launched from Makefile)
+# Command to keep the container running (not necessary with the docker-compose)
 # CMD ["tail", "-f", "/dev/null"]
