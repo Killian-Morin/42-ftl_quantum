@@ -1,15 +1,8 @@
 import os
 from dotenv import load_dotenv
+from print_color import print
 
 from qiskit_ibm_runtime import QiskitRuntimeService
-
-
-UNDERLINE = '\033[04m'
-RED = '\033[31m'
-GREEN = '\033[32m'
-BLUE = '\033[34m'
-PURPLE = '\033[35m'
-RESET = '\033[0m'
 
 
 def load_account():
@@ -26,7 +19,7 @@ def load_account():
     token = os.getenv("TOKEN")
 
     QiskitRuntimeService.save_account(channel="ibm_quantum", token=token, overwrite=True)
-    print(f"{GREEN}Account loaded !\n\n{RESET}")
+    print("Account loaded !\n", tag='success', tag_color='green', color='white')
 
 
 def process_data(service):
@@ -39,7 +32,7 @@ def process_data(service):
 
     backends = service.backends()
 
-    print(f"{BLUE}Backends accessible with this account:{RESET}")
+    print("Backends accessible with this account:", color='blue')
     for bck in backends:
         if bck.simulator:
             bck_type = "simulated"
@@ -48,12 +41,14 @@ def process_data(service):
         status = bck.status()
         date = bck.online_date.strftime("%d %b %Y, %I:%M%p %Z")
         processor_type = bck.processor_type["family"]
-        print(f"\t{PURPLE}{bck.name}{RESET} | " +
-                f"{UNDERLINE}{bck_type}{RESET} quantum computer | " +
-                f"pending jobs: {UNDERLINE}{status.pending_jobs}{RESET} | " +
-                f"total number of qubits: {UNDERLINE}{bck.num_qubits}{RESET} | " +
-                f"went online on {UNDERLINE}{date}{RESET} | " +
-                f"type of processor: {UNDERLINE}{processor_type}{RESET}")
+
+        print(f"\t{bck.name}", color='purple', end=' | ')
+        print(bck_type, format='underline', end=' ')
+        print("quantum computer | pending jobs: ", end=' ')
+        print(status.pending_jobs, color='cyan', end=' | ')
+        print("total number of qubits: ", end=' ')
+        print(bck.num_qubits, color='cyan', end=' | ')
+        print(f"went online on {date} | type of processor: {processor_type}")
 
 
 def main():
@@ -66,9 +61,9 @@ def main():
 
     try:
         service = QiskitRuntimeService(instance="ibm-q/open/main")
-        print(f"{GREEN}No exception, the account was already saved{RESET}\n\n")
+        print("No exception, the account was already saved\n", tag='success', tag_color='green', color='white')
     except Exception:
-        print(f"{RED}Exception catched, the account was not saved and needs to be loaded{RESET}\n\n")
+        print("The account was not saved and needs to be loaded\n", tag='exception', tag_color='red', color='white')
         load_account()
         service = QiskitRuntimeService(instance="ibm-q/open/main")
 

@@ -4,19 +4,18 @@ WORKDIR /usr/src/app/
 
 RUN pip install --upgrade pip
 
-RUN pip install python-dotenv
+# Copy the requirements for the build
+COPY ./requirements.txt ./requirements.txt
 
-RUN pip install --no-cache-dir \
-    qiskit \
-    'qiskit[visualization]' \
-    qiskit_aer \
-    qiskit_ibm_runtime \
-    matplotlib \
-    ipython
+# Install uv, a fast python package manager
+RUN pip install --no-cache-dir uv
+
+# Install the dependencies from the requirements.txt using uv
+RUN uv pip install --no-cache-dir --system -r ./requirements.txt
 
 # Copy relevant files into the container at /usr/src/app
 COPY ./exercices ./exercices
 COPY .env ./.env
 
-# Command to keep the container running (not necessary with the docker-compose)
-# CMD ["tail", "-f", "/dev/null"]
+# No CMD instruction to keep the container running
+# the command that does that is specified in the docker-compose.yml

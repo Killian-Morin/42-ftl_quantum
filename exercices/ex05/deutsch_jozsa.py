@@ -1,11 +1,13 @@
 import os
 import sys
 from dotenv import load_dotenv
+from print_color import print
 
-from qiskit import QuantumCircuit
+from qiskit import QuantumCircuit, transpile
 from qiskit_aer import AerSimulator
 from qiskit_ibm_runtime import QiskitRuntimeService, SamplerV2 as Sampler
-from qiskit.visualization import plot_histogram
+from qiskit_ibm_runtime.fake_provider import FakeSherbrooke
+from qiskit.visualization import plot_histogram, plot_distribution
 from qiskit.transpiler.preset_passmanagers import generate_preset_pass_manager
 
 
@@ -13,13 +15,24 @@ NB_QUBITS = 4
 SHOTS = 500
 
 RESET = '\033[0m'
-GREEN = '\033[32m'
 RED = '\033[31m'
-YELLOW = '\033[33m'
-BLUE = '\033[34m'
-PURPLE = '\033[35m'
-PINK = '\033[95m'
-BOLD = '\033[01m'
+
+
+def load_account():
+    """ Load the account associated with the token found in the .env
+
+    * Take environment variables from .env
+    * Get the TOKEN var from the .env that was loaded
+
+    * Save the account to disk for future use using the token,
+    * 'overwrite' to 'True' so that the existing account is overwritten
+    """
+
+    load_dotenv()
+    token = os.getenv("TOKEN")
+
+    QiskitRuntimeService.save_account(channel="ibm_quantum", token=token, overwrite=True)
+    print("Account loaded !\n", tag='success', tag_color='green', color='white')
 
 
 def constant_oracle_subject():
@@ -40,7 +53,7 @@ def constant_oracle_subject():
 
     qc.draw(output="mpl", filename="constant_oracle_subject")
 
-    print(f"{GREEN}Created the constant oracle function from the subject{RESET}")
+    print("Created the constant oracle function from the subject\n", color='green', tag='info', tag_color='cyan')
 
     return qc
 
@@ -71,13 +84,14 @@ def balanced_oracle_subject():
 
     qc.draw(output="mpl", filename="balanced_oracle_subject")
 
-    print(f"{GREEN}Created the balanced oracle function from the subject{RESET}")
+    print("Created the constant balanced function from the subject\n", color='green', tag='info', tag_color='cyan')
 
     return qc
 
 
 def oracle_eval():
     """ Placeholder to put the oracle given during the correction """
+    return 0
 
 
 def compile_circuit(oracle_function):
@@ -127,17 +141,17 @@ def compile_circuit(oracle_function):
 
     qc.draw(output="mpl", filename="composed_circuit")
 
-    print(f"Composed the instructions of the oracle on a circuit to use it in the Deutsch-Jozsa algorithm")
+    print("Composed the instructions of the oracle on a circuit to use it in the Deutsch-Jozsa algorithm", tag='info', tag_color='cyan')
 
     return qc
 
 
-def sim_run_oracle(oracle_function):
-    """ Run the Oracle on a simulator
+def aer_run_oracle(oracle):
+    """ Run the Oracle with an AerSimulator
 
     Param
     -----
-        oracle_function (QuantumCircuit): the circuit of the oracle function
+        oracle (QuantumCircuit): the circuit of the oracle function
 
     * Get an AerSimulator, the method used is automatically selected based on the circuit and noise model
     * Run the composed circuit on a AerSimulator SHOTS times
@@ -149,27 +163,75 @@ def sim_run_oracle(oracle_function):
     * Plot the counts result
     """
 
-    print("\nThis will run the circuit on a Qiskit Aer simulator ...")
+    print("\n=============================\n", color='yellow')
+
+    print("Running the circuit with an AerSimulator", tag='info', tag_color='cyan')
 
     sim = AerSimulator(method='automatic')
 
-    result = sim.run(oracle_function, shots=SHOTS, memory=True).result()
+    result = sim.run(oracle, shots=SHOTS, memory=True).result()
 
     sim_type = result.results[0].metadata['method']
-    print(f"The type of AerSimulator used was {PURPLE}{sim_type} {RESET}\n")
+    print("The type of AerSimulator used is ", end='')
+    print(f"{sim_type}\n", color='purple')
 
     measurements = result.get_memory()
     counts = result.get_counts()
 
-    print(f"The measurements for the q_0, q_1 and q_2 are: {YELLOW}{measurements}{RESET}\n")
+    print("The measurements for the q_0, q_1 and q_2 are: ", tag='RESULT - AerSimulator', tag_color='red', color='white')
+    print(f"{measurements}\n", color='yellow')
 
     if "1" in measurements[0]:
-        print(f"{RED}RESULT - SIMULATOR{RESET}: The function is {YELLOW}balanced{RESET}, some qubits at 1 !\n")
+        print("The function is", tag='RESULT - AerSimulator', tag_color='red', color='white', end=' ')
+        print("balanced", color='yellow', end=' , ')
+        print("all qubits at 1 !")
     else:
-        print(f"{RED}RESULT - SIMULATOR{RESET}: The function is {YELLOW}constant{RESET}, all qubits at 0 !\n")
+        print("The function is", tag='RESULT - AerSimulator', tag_color='red', color='white', end=' ')
+        print("constant", color='yellow', end=' , ')
+        print("all qubits at 0 !")
 
-    title = f"Counts measurement result for the simulation of type {sim_type}"
-    plot_histogram(counts, title=title, filename="histogram_sim_counts", figsize=(12, 8))
+    title = f"Count result with AerSimulator using method {sim_type} on {SHOTS} shots"
+    plot_histogram(counts, title=title, filename="histogram_aer", figsize=(12, 8))
+
+
+def fake_run_oracle(oracle):
+    """ Run the circuit with a FakeBackend simulator
+
+    Param
+    -----
+        oracle (QuantumCircuit): the circuit to run
+
+    * Get the FakeBackend simulator, mimics behaviors of real systems
+    * Transpile (i.e. adapt) the circuit for the simulator obtained
+    * Get a Primitive, here SamplerV2, for the particular backend obtained
+        * https://docs.quantum.ibm.com/api/qiskit/primitives
+    * Run the circuit on the simulator with a precise number of shots
+    * Get the name of the ClassicalRegister from the circuit
+    * Sort the dict of the results by keys
+    * Process (print and plot) the result
+    """
+
+    print("\n=============================\n", color='yellow')
+
+    print("Running the circuit with a FakeBackend simulator", tag='info', tag_color='cyan')
+
+    backend = FakeSherbrooke()
+
+    qc_transpile = transpile(oracle, backend)
+
+    sampler = Sampler(backend)
+    job = sampler.run([qc_transpile], shots=SHOTS)
+    result = job.result()[0]
+    bits_name = oracle.cregs[0].name
+    counts = getattr(result.data, bits_name).get_counts()
+
+    counts = dict(sorted(counts.items()))
+
+    print(f"The measurements for the q_0, q_1 and q_2 are: ", tag='RESULT - FakeBackend', tag_color='red', color='white', end='')
+    print(f"{counts}\n", color='purple')
+
+    title = f"Count result with the FakeBackend simulation on {SHOTS} shots"
+    plot_histogram(counts, title=title, filename="histogram_fake", figsize=(12, 8))
 
 
 def get_backend_computer():
@@ -184,21 +246,23 @@ def get_backend_computer():
         backend (IBMBackend): instance of a backend representing an IBM Quantum Backend
     """
 
+    print("=============================\n", color='yellow')
+
     try:
         service = QiskitRuntimeService(instance="ibm-q/open/main")
-        print(f"{GREEN}No exception, the account was already saved{RESET}\n")
+        print("No exception, the account was already saved\n", tag='success', tag_color='green', color='white')
     except Exception:
-        print(f"{RED}Exception catched, the account was not saved and needs to be loaded{RESET}")
-        load_dotenv()
-        token = os.getenv("TOKEN")
-        service = QiskitRuntimeService(channel='ibm_quantum', instance="ibm-q/open/main", token=token)
-        QiskitRuntimeService.save_account(channel="ibm_quantum", token=token, overwrite=True)
-        print(f"{GREEN}Account loaded{RESET}")
+        print("The account was not saved and needs to be loaded\n", tag='exception', tag_color='red', color='white')
+        load_account()
+        service = QiskitRuntimeService(instance="ibm-q/open/main")
 
     print("Get the least busy and operational quantum computer ...")
     backend = service.least_busy(operational=True, simulator=False)
     backend_status = backend.status()
-    print(f"It's {PURPLE}{backend.name}{RESET} ({backend_status.pending_jobs} pending jobs)\n")
+    print("This will run on ", end='')
+    print(backend.name, color='cyan', end=' (')
+    print(backend_status.pending_jobs, end=' ')
+    print("pending jobs)\n")
 
     return backend
 
@@ -222,10 +286,13 @@ def real_run_oracle(oracle_function):
     * In the PubResult, get the data attribute, inside it there are the classical bits
         * The way I instantiate the QuantumCircuit, the ClassicalRegister get the name 'c'
         * we use this name to get their content
+    * Sort the dict of the results by keys
     * Plot the result in a histogram, saved as 'histogram_real_result_{job_id}'
     """
 
-    print("\nThis will run the circuit on a real quantum computer ...")
+    print("=============================\n", color='yellow')
+
+    print("Running the circuit on a real quantum computer ...", tag='info', tag_color='cyan')
 
     bck = get_backend_computer()
 
@@ -249,16 +316,12 @@ def real_run_oracle(oracle_function):
 
     counts = getattr(result.data, classical_bits_name).get_counts()
 
-    # try:
-    #     counts = result.data.c.get_counts()
-    #     print(f"The classical bits/result was in {BOLD}c{RESET}")
-    # except Exception:
-    #     counts = result.data.meas.get_counts()
-    #     print(f"The classical bits/result was in {BOLD}meas{RESET}")
+    counts = dict(sorted(counts.items()))
 
-    print(f"{RED}RESULT - HARDWARE{RESET}: with {SHOTS} the qubits are at {counts}")
+    print(f"on {SHOTS}, the qubits are at: ", tag='RESULT - Real', tag_color='red', color='white', end='')
+    print(f"{counts}\n", color='purple')
 
-    title = f"Counts measurement result of {job_id} runned on {bck.name} real quantum computer"
+    title = f"Count result of {job_id} runned on {bck.name} real quantum computer"
     plot_histogram(counts, title=title, filename=f"histogram_real_counts_{job_id}", figsize=(12, 8))
 
 
@@ -283,18 +346,22 @@ def main():
         oracle_function = constant_oracle_subject()
     elif choice == "balanced":
         oracle_function = balanced_oracle_subject()
-    # ? FOR THE ORACLE FUNCTION GIVEN IN THE CORRECTION
     elif choice == "eval":
-        # oracle_function = oracle_eval()
-        # print("\nThe oracle function of the correction (view it in correction_oracle_function.png)")
-        # oracle_function.draw(output="mpl", filename="correction_oracle_function")
-        return
+        oracle_function = oracle_eval()
+        if oracle_function == 0:
+            print("There is no oracle function in oracle_eval()", color='red')
+            return
+        oracle_function.draw(output="mpl", filename="correction_oracle_function")
+        print("Created the oracle from the correction\n", color='green', tag='info', tag_color='cyan')
 
     circuit_compiled = compile_circuit(oracle_function)
 
-    sim_run_oracle(circuit_compiled)
+    aer_run_oracle(circuit_compiled)
 
-    real_run = input(f"{BLUE}Do you want to run this circuit on a real quantum computer ? (y or n): {RESET}")
+    fake_run_oracle(circuit_compiled)
+
+    print("Do you want to run this circuit on a real quantum computer ? (y or n)", color='cyan', tag='prompt', end=': ')
+    real_run = input()
 
     if real_run == "y":
         real_run_oracle(circuit_compiled)

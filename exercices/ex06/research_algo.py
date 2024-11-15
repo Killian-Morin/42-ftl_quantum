@@ -1,6 +1,7 @@
 import os
 import sys
 from dotenv import load_dotenv
+from print_color import print
 
 from qiskit import QuantumCircuit
 from qiskit_aer import AerSimulator
@@ -13,36 +14,56 @@ from qiskit import transpile
 
 
 RESET = '\033[0m'
-GREEN = '\033[32m'
 RED = '\033[31m'
-YELLOW = '\033[33m'
-BLUE = '\033[34m'
-PURPLE = '\033[35m'
-CYAN = '\033[36m'
-
 SHOTS = 500
 
 
-def get_backend_computer():
-    """  Get a backend quantum computer """
+def load_account():
+    """ Load the account associated with the token found in the .env
 
-    # * Try to get an instance, need to have the IBMQ account loaded
-    # * If not loaded, load the token and save the account
+    * Take environment variables from .env
+    * Get the TOKEN var from the .env that was loaded
+
+    * Save the account to disk for future use using the token,
+    * 'overwrite' to 'True' so that the existing account is overwritten
+    """
+
+    load_dotenv()
+    token = os.getenv("TOKEN")
+
+    QiskitRuntimeService.save_account(channel="ibm_quantum", token=token, overwrite=True)
+    print("Account loaded !\n", tag='success', tag_color='green', color='white')
+
+
+def get_backend_computer():
+    """ Get a Service Backend to run the circuit on
+
+    * Try to get a service instance, need to have the IBMQ account loaded
+    * If not loaded, call load_account()
+    * Get the least busy and operational backend quantum computer
+
+    Return
+    -----
+        backend (IBMBackend): instance of a backend representing an IBM Quantum Backend
+    """
+
+    print("=============================\n", color='yellow')
+
     try:
         service = QiskitRuntimeService(instance="ibm-q/open/main")
-        print(f"{GREEN}No exception, the account was already saved{RESET}\n\n")
+        print("No exception, the account was already saved\n", tag='success', tag_color='green', color='white')
     except Exception:
-        print(f"{RED}Exception catched, the account was not saved and needs to be loaded{RESET}")
-        load_dotenv()
-        token = os.getenv("TOKEN")
-        service = QiskitRuntimeService(channel='ibm_quantum', instance="ibm-q/open/main", token=token)
-        QiskitRuntimeService.save_account(channel="ibm_quantum", token=token, overwrite=True)
+        print("The account was not saved and needs to be loaded\n", tag='exception', tag_color='red', color='white')
+        load_account()
+        service = QiskitRuntimeService(instance="ibm-q/open/main")
 
-    # * Get the least busy and operational backend quantum computer and print it
     print("Get the least busy and operational quantum computer ...")
     backend = service.least_busy(operational=True, simulator=False)
     backend_status = backend.status()
-    print(f"It's {PURPLE}{backend.name}{RESET} ({backend_status.pending_jobs} pending jobs)\n")
+    print("This will run on ", end='')
+    print(backend.name, color='cyan', end=' (')
+    print(backend_status.pending_jobs, end=' ')
+    print("pending jobs)\n")
 
     return backend
 
@@ -156,8 +177,8 @@ def diffuser(qc, oracle):
     return qc
 
 
-def sim_run_search(circuit):
-    """ Run the search algorithm on a simulator
+def aer_run_search(circuit):
+    """ Run the search algorithm on an AerSimulator
 
     Param
     -----
@@ -166,12 +187,13 @@ def sim_run_search(circuit):
     * Get an AerSimulator, the method used is automatically selected based on the circuit and noise model
     * Transpile/adapt the circuit for the simulator
     * Run the circuit
+    * Sort the dict of the results by keys
     * Process the results (type of simulation, results, plot)
-
-    * The commented part is the same process but using a FakeBackend simulator and SamplerV2
     """
 
-    print(f"\n{YELLOW}Run the search algorithm with an AerSimulator{RESET}\n")
+    print("\n=============================\n", color='yellow')
+
+    print("Running the circuit with an AerSimulator", tag='info', tag_color='cyan')
 
     sim = AerSimulator(method='automatic')
 
@@ -180,31 +202,61 @@ def sim_run_search(circuit):
     result_sim = sim.run(qc_transpile_sim, shots=SHOTS).result()
 
     sim_type = result_sim.results[0].metadata['method']
-    counts_sim = result_sim.get_counts()
+    counts = result_sim.get_counts()
 
-    title_sim = f"Counts measurement result with the AerSimulator of type {sim_type}"
-    plot_histogram(counts_sim, title=title_sim, filename="histogram_sim", figsize=(12, 8))
+    counts = dict(sorted(counts.items()))
 
-    title_sim = f"Percentage measurement result with the AerSimulator of type {sim_type}"
-    plot_distribution(counts_sim, title=title_sim, filename="distribution_sim", figsize=(12, 8))
+    print(f"on {SHOTS}, the qubits are at: ", tag='RESULT - AerSimulator', tag_color='red', color='white', end='')
+    print(f"{counts}\n", color='yellow')
 
-    # print(f"\n{YELLOW}Run the search algorithm with a Fake backend simulator (FakeSherbrooke){RESET}")
+    title_sim = f"Count result with the AerSimulator of type {sim_type}"
+    plot_histogram(counts, title=title_sim, filename="histogram_aer", figsize=(12, 8))
 
-    # backend = FakeSherbrooke()
+    title_sim = f"Percentage result with the AerSimulator of type {sim_type}"
+    plot_distribution(counts, title=title_sim, filename="distribution_aer", figsize=(12, 8))
 
-    # qc_transpile = transpile(circuit, backend)
 
-    # sampler = Sampler(backend)
-    # job = sampler.run([qc_transpile], shots=SHOTS)
-    # result = job.result()[0]
-    # bits_name = circuit.cregs[0].name
-    # counts = getattr(result.data, bits_name).get_counts()
+def fake_run_search(circuit):
+    """ Run the circuit with a FakeBackend simulator
 
-    # title = f"Counts measurement result with the FakeBackend simulation and {SHOTS} shots"
-    # plot_histogram(counts, title=title, filename="histogram_fake", figsize=(12, 8))
+    Param
+    -----
+        oracle (QuantumCircuit): the circuit to run
 
-    # title = f"Percentage result with the FakeBackend simulation and {SHOTS} shots"
-    # plot_distribution(counts, title=title, filename="distribution_fake", figsize=(12, 8))
+    * Get the FakeBackend simulator, mimics behaviors of real systems
+    * Transpile (i.e. adapt) the circuit for the simulator obtained
+    * Get a Primitive, here SamplerV2, for the particular backend obtained
+        * https://docs.quantum.ibm.com/api/qiskit/primitives
+    * Run the circuit on the simulator with a precise number of shots
+    * Get the name of the ClassicalRegister from the circuit
+    * Sort the dict of the results by keys
+    * Process (print and plot) the result
+    """
+
+    print("\n=============================\n", color='yellow')
+
+    print("Running the circuit with a FakeBackend simulator", tag='info', tag_color='cyan')
+
+    backend = FakeSherbrooke()
+
+    qc_transpile = transpile(circuit, backend)
+
+    sampler = Sampler(backend)
+    job = sampler.run([qc_transpile], shots=SHOTS)
+    result = job.result()[0]
+    bits_name = circuit.cregs[0].name
+    counts = getattr(result.data, bits_name).get_counts()
+
+    counts = dict(sorted(counts.items()))
+
+    print(f"on {SHOTS}, the qubits are at: ", tag='RESULT - FakeBackend', tag_color='red', color='white', end='')
+    print(f"{counts}\n", color='purple')
+
+    title = f"Count result with the FakeBackend simulation and {SHOTS} shots"
+    plot_histogram(counts, title=title, filename="histogram_fake", figsize=(12, 8))
+
+    title = f"Percentage with the FakeBackend simulation and {SHOTS} shots"
+    plot_distribution(counts, title=title, filename="distribution_fake", figsize=(12, 8))
 
 
 def real_run_search(circuit):
@@ -226,10 +278,13 @@ def real_run_search(circuit):
     * In the PubResult, get the data attribute, inside it there are the classical bits
         * The way I instantiate the QuantumCircuit, the ClassicalRegister get the name 'c'
         * we use this name to get their content
+    * Sort the dict of the results by keys
     * Plot the result as counts and percentage in histograms
     """
 
-    print(f"\n{CYAN}This will run the circuit on a real quantum computer ...{RESET}")
+    print("=============================\n", color='yellow')
+
+    print("Running the circuit on a real quantum computer ...", tag='info', tag_color='cyan')
 
     bck = get_backend_computer()
 
@@ -253,10 +308,15 @@ def real_run_search(circuit):
 
     counts = getattr(result.data, classical_bits_name).get_counts()
 
-    title = f"Counts measurement result of {job_id} runned on {bck.name}"
+    counts = dict(sorted(counts.items()))
+
+    print(f"on {SHOTS}, the qubits are at: ", tag='RESULT - Real', tag_color='red', color='white', end='')
+    print(f"{counts}\n", color='purple')
+
+    title = f"Count result of {job_id} runned on {bck.name}"
     plot_histogram(counts, title=title, filename=f"histogram_real_{job_id}", figsize=(12, 8))
 
-    title = f"Percentage measurement result of {job_id} runned on {bck.name}"
+    title = f"Percentage result of {job_id} runned on {bck.name}"
     plot_distribution(counts, title=title, filename=f"distribution_real_{job_id}", figsize=(12, 8))
 
 
@@ -275,28 +335,29 @@ def main():
 
     qubits_nb = int(sys.argv[1]) if int(sys.argv[1]) >= 2 else 2
 
-    print(f"{GREEN}Will create a circuit with {qubits_nb} qubits !{RESET}\n")
-
     qc = state_initialisation(qubits_nb)
 
-    print(f"{BLUE}Created the circuit with {qubits_nb} qubits and initialized them.{RESET}")
+    print(f"Created the circuit with {qubits_nb} qubits and initialized them", color='blue', tag='info', tag_color='cyan')
 
     oracle = oracle_creation()
 
     if oracle == 0 and qubits_nb == 3:
-        print(f"\n{YELLOW}The default oracle, from the subject was used\n")
+        print("The default oracle, from the subject was used\n", color='green', tag='info', tag_color='cyan')
         oracle = oracle_example()
     elif oracle == 0:
-        print(f"{RED}No oracle function available and not compatible with the oracle from the example{RESET}")
+        print("No oracle function available and not compatible with the oracle from the example", color='red')
         return
 
-    print(f"{PURPLE}The oracle was created !{RESET}")
+    print("The oracle was created !", color='purple', tag='info', tag_color='cyan')
 
     circuit = diffuser(qc, oracle)
 
-    sim_run_search(circuit)
+    aer_run_search(circuit)
 
-    real_run = input(f"{BLUE}Do you want to run this circuit on a real quantum computer ? (y or n): {RESET}")
+    fake_run_search(circuit)
+
+    print("Do you want to run this circuit on a real quantum computer ? (y or n)", color='blue', tag='prompt', end=': ')
+    real_run = input()
 
     if real_run == "y":
         real_run_search(circuit)
